@@ -64,3 +64,21 @@ def get_most_recent_by_city(request: MostRecentByCityRequest, conn=Depends(get_d
     repository = DenunciaRepository(conn)
     controller = DenunciaController(repository)
     return controller.get_most_recent_by_city(request.city, request.state)
+
+@router.get("/all")
+def get_all_denuncias(conn=Depends(get_db_connection)):
+    repository = DenunciaRepository(conn)
+    return repository.find_all()
+
+@router.get("/count/resolvidas")
+def count_denuncias_resolvidas(conn=Depends(get_db_connection)):
+    repository = DenunciaRepository(conn)
+    count = repository.count_by_status("Resolvida")
+    return {"count": count}
+
+@router.get("/count/pendentes")
+def count_denuncias_pendentes(conn=Depends(get_db_connection)):
+    repository = DenunciaRepository(conn)
+    # Contar denúncias com status diferente de 'Resolvida'
+    total = repository.count_by_status("Registrada") + repository.count_by_status("Em Validação") + repository.count_by_status("Em Andamento")
+    return {"count": total}

@@ -9,11 +9,9 @@ import {
 } from "@app/components/primitives/dialog";
 import { Input } from "@app/components/primitives/input";
 import type { ReactNode } from "react";
-import { useNavigate } from "react-router";
-import { useLoginMutation } from "../../../../hooks/login-user";
 import { useForm } from "@tanstack/react-form";
 import { Spinner } from "@app/components/primitives/spinner";
-import { useReporterProfileMutation } from "./hooks";
+import { useReporterLoginMutation } from "./hooks";
 
 interface Props {
   children: ReactNode;
@@ -25,32 +23,15 @@ const defaultValues = {
 };
 
 export const AuthDialog = ({ children }: Props) => {
-  const navigate = useNavigate();
-  const { login, isLoginLoading } = useLoginMutation();
-  const { mutateReporterProfile } = useReporterProfileMutation();
+  const { loginReporter, isReporterLoginLoading } = useReporterLoginMutation();
 
   const form = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
-      await login(
-        {
-          email: value.email,
-          password: value.password,
-        },
-        {
-          onSuccess: async (data) => {
-            await mutateReporterProfile(
-              { cpf: data.cpf },
-              {
-                onSuccess: (data) => {
-                  console.log(data);
-                  navigate("/report");
-                },
-              }
-            );
-          },
-        }
-      );
+      loginReporter({
+        email: value.email,
+        password: value.password,
+      });
     },
     validators: {
       onChange: ({ value }) => {
@@ -119,9 +100,9 @@ export const AuthDialog = ({ children }: Props) => {
                   className="flex-1"
                   type="submit"
                   size="xl"
-                  disabled={isLoginLoading || !state.canSubmit}
+                  disabled={isReporterLoginLoading || !state.canSubmit}
                 >
-                  {isLoginLoading ? <Spinner /> : "Avançar"}
+                  {isReporterLoginLoading ? <Spinner /> : "Avançar"}
                 </Button>
               )}
             />

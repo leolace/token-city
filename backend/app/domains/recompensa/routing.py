@@ -23,3 +23,9 @@ def redeem_recompensa(rewardId: str, request: RedeemRequest, conn=Depends(get_db
     denunciante_repository = DenuncianteRepository(conn)
     controller = RecompensaController(recompensa_repository, denunciante_repository)
     return controller.redeem_recompensa(request.userId, rewardId)
+
+@router.get("/count/resgates")
+def count_resgates(conn=Depends(get_db_connection)):
+    repository = RecompensaRepository(conn)
+    count = repository.count_resgates()
+    return {"count": count}

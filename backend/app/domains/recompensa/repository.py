@@ -32,3 +32,9 @@ class RecompensaRepository:
                 (recompensa_nome, usuario_cpf)
             )
             self.connection.commit()
+
+    def count_resgates(self) -> int:
+        with self.connection.cursor() as cursor:
+            cursor.execute("SELECT COUNT(*) FROM Resgate")
+            result = cursor.fetchone()
+            return result[0] if result else 0

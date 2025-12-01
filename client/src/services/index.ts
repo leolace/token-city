@@ -6,7 +6,11 @@ import type {
   LoginRequest,
   ReporterProfileRequest,
 } from "./request";
-import type { RepoerterProfileResponse } from "./response";
+import type {
+  CountResponse,
+  Report,
+  RepoerterProfileResponse,
+} from "./response";
 
 export const coreService = {
   login: async (json: LoginRequest) => {
@@ -21,6 +25,22 @@ export const coreService = {
     create: async (json: CreateReportRequest) => {
       await client.post(endpoints.report.create, { json });
     },
+    all: async () => {
+      const data = await client.get(endpoints.report.all).json<Report[]>();
+      return data;
+    },
+    countResolved: async () => {
+      const data = await client
+        .get(endpoints.report.countResolved)
+        .json<CountResponse>();
+      return data;
+    },
+    countPending: async () => {
+      const data = await client
+        .get(endpoints.report.countPending)
+        .json<CountResponse>();
+      return data;
+    },
   },
 
   reporter: {
@@ -29,6 +49,15 @@ export const coreService = {
         .get(endpoints.reporter.profile(cpf))
         .json<RepoerterProfileResponse>();
 
+      return data;
+    },
+  },
+
+  reward: {
+    countRedeemed: async () => {
+      const data = await client
+        .get(endpoints.reward.countRedeemed)
+        .json<CountResponse>();
       return data;
     },
   },

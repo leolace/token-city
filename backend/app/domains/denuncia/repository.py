@@ -161,3 +161,43 @@ class DenunciaRepository:
                     U.Nome
             """, (nome_cidade, sigla_estado))
             return cursor.fetchall()
+
+    def find_all(self) -> List[Dict[Any, Any]]:
+        with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute("""
+                SELECT
+                    D.Categoria,
+                    D.Usuario,
+                    D.Data,
+                    D.Coordenadas,
+                    D.Descricao,
+                    D.Valida,
+                    D.Prioridade,
+                    H.Status,
+                    U.Nome AS NomeUsuario
+                FROM
+                    Denuncia AS D
+                INNER JOIN
+                    Historico_Denuncia AS H
+                    ON D.Usuario = H.Usuario
+                    AND D.Data = H.Data
+                    AND D.Coordenadas = H.Coordenadas
+                INNER JOIN
+                    Usuario AS U ON D.Usuario = U.CPF
+                ORDER BY D.Data DESC
+            """)
+            return cursor.fetchall()
+
+    def count_by_status(self, status: str) -> int:
+        with self.connection.cursor() as cursor:
+            cursor.execute("""
+                SELECT COUNT(*)
+                FROM Denuncia AS D
+                INNER JOIN Historico_Denuncia AS H
+                    ON D.Usuario = H.Usuario
+                    AND D.Data = H.Data
+                    AND D.Coordenadas = H.Coordenadas
+                WHERE H.Status = %s
+            """, (status,))
+            result = cursor.fetchone()
+            return result[0] if result else 0

@@ -41,12 +41,19 @@ export const ReportForm = () => {
     onSubmit: async ({ value }) => {
       console.log({ ...value, latitude, longitude, userid: reporter?.cpf });
 
-      if (!reporter || !latitude || !longitude) return;
+      if (
+        !reporter ||
+        !latitude ||
+        !longitude ||
+        !value.content ||
+        !value.category
+      )
+        return;
 
       await reportCreateMutate(
         {
           coordinates: { latitude, longitude },
-          userid: reporter?.cpf,
+          userid: reporter.cpf,
           category: value.category,
           content: value.content,
           image: value.image,
