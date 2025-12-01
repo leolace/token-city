@@ -8,12 +8,9 @@ from app.domains.denunciante.controller import DenuncianteController
 
 router = APIRouter(prefix="/denunciante", tags=["denunciante"])
 
-class GetCPF(BaseModel):
-    cpf: str
-
-@router.get("/profile")
-def get_denunciante_profile(body: GetCPF, conn=Depends(get_db_connection)):
+@router.get("/profile/{cpf}")
+def get_denunciante_profile(cpf: str, conn=Depends(get_db_connection)):
     denunciante_repository = DenuncianteRepository(conn)
     controller = DenuncianteController(denunciante_repository)
     
-    return controller.get_denunciante_profile(body.cpf)
+    return controller.get_denunciante_profile(cpf)

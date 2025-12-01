@@ -17,8 +17,6 @@ class CreateDenunciaRequest(BaseModel):
     category: str
     totem: str
     coordinates: Coordinates
-    city: str
-    state: str
     image: Optional[str] = None
 
 class DenunciasByAreaRequest(BaseModel):
@@ -41,8 +39,6 @@ def create_denuncia(request: CreateDenunciaRequest, conn=Depends(get_db_connecti
         request.content,
         request.totem,
         coordenadas_str,
-        request.city,
-        request.state,
         request.image
     )
 

@@ -18,8 +18,8 @@ export const SuccessPage = () => {
           Agradecemos por contribuir para a melhoria da sua comunidade.
         </p>
 
-        <div className="mt-6">
-          <Button size="xl" onClick={() => navigate("/")}>
+        <div className="mt-6 w-full">
+          <Button size="xl" onClick={() => navigate("/")} className="w-full">
             Voltar para a página inicial
           </Button>
         </div>

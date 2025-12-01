@@ -9,7 +9,7 @@ class UsuarioController:
         self.login_use_case = LoginUseCase(usuario_repository)
         self.signup_use_case = SignupUseCase(usuario_repository, denunciante_repository)
         self.get_top_denunciante_use_case = GetTopDenuncianteUseCase(denunciante_repository)
-        self.get_denunciante_profile =  GetDenuncianteProfileUseCase()
+        self.get_denunciante_profile =  GetDenuncianteProfileUseCase(denunciante_repository, usuario_repository)
 
     def login(self, email: str, senha: str):
         usuario = self.login_use_case.execute(email, senha)
@@ -29,8 +29,9 @@ class UsuarioController:
         if not result:
             raise HTTPException(status_code=404, detail="Nenhum denunciante encontrado")
         return result
+
     def  get_denunciante_profile(self):
-        result = self.get_top_denunciante_use_case.execute()
+        result = self.get_denunciante_profile.execute()
         if not result:
             raise HTTPException(status_code=404, detail="Nenhum denunciante encontrado")
         return result

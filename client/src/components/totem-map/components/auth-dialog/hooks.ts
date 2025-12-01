@@ -1,13 +1,15 @@
 import { coreService } from "@app/services";
-import type { LoginRequest } from "@app/services/request";
+import type { ReporterProfileRequest } from "@app/services/request";
 import { useUserStore } from "@app/stores/user";
 import { useMutation } from "@tanstack/react-query";
 
-export const useLoginMutation = () => {
+export const useReporterProfileMutation = () => {
   const setReporter = useUserStore((state) => state.setReporter);
-  const mutation = useMutation({
-    mutationFn: async (req: LoginRequest) => {
-      const data = await coreService.login(req);
+
+  const { data, mutateAsync } = useMutation({
+    mutationFn: async ({ cpf }: ReporterProfileRequest) => {
+      console.log("Fetching reporter profile for CPF:", cpf);
+      const data = await coreService.reporter.profile({ cpf });
 
       return data;
     },
@@ -16,8 +18,5 @@ export const useLoginMutation = () => {
     },
   });
 
-  return {
-    login: mutation.mutateAsync,
-    isLoginLoading: mutation.isPending,
-  };
+  return { mutateReporterProfile: mutateAsync, reporterProfile: data };
 };

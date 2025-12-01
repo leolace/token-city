@@ -9,11 +9,11 @@ import {
 } from "@app/components/primitives/dialog";
 import { Input } from "@app/components/primitives/input";
 import type { ReactNode } from "react";
-import { useMap } from "react-map-gl/maplibre";
 import { useNavigate } from "react-router";
-import { useLoginMutation } from "./hooks";
+import { useLoginMutation } from "../../../../hooks/login-user";
 import { useForm } from "@tanstack/react-form";
 import { Spinner } from "@app/components/primitives/spinner";
+import { useReporterProfileMutation } from "./hooks";
 
 interface Props {
   children: ReactNode;
@@ -26,8 +26,9 @@ const defaultValues = {
 
 export const AuthDialog = ({ children }: Props) => {
   const navigate = useNavigate();
-  const { totemMap } = useMap();
   const { login, isLoginLoading } = useLoginMutation();
+  const { mutateReporterProfile } = useReporterProfileMutation();
+
   const form = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
@@ -37,16 +38,22 @@ export const AuthDialog = ({ children }: Props) => {
           password: value.password,
         },
         {
-          onSuccess: (data) => {
-            console.log(data);
-            navigate("/report", { state: totemMap?.getBearing() });
+          onSuccess: async (data) => {
+            await mutateReporterProfile(
+              { cpf: data.cpf },
+              {
+                onSuccess: (data) => {
+                  console.log(data);
+                  navigate("/report");
+                },
+              }
+            );
           },
         }
       );
     },
     validators: {
       onChange: ({ value }) => {
-        console.log(value);
         if (value.email.length === 0 || value.password.length === 0)
           return "Preencha todos os campos";
         return undefined;

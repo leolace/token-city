@@ -7,7 +7,5 @@ export interface CreateReportRequest {
     latitude: number;
     longitude: number;
   };
-  city: string;
-  state: string;
   image: string;
 }

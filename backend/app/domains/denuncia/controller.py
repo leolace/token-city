@@ -11,8 +11,8 @@ class DenunciaController:
         self.get_metrics_by_department_use_case = GetMetricsByDepartmentUseCase(denuncia_repository)
         self.get_most_recent_by_city_use_case = GetMostRecentByCityUseCase(denuncia_repository)
 
-    def create_denuncia(self, userid: str, category: str, content: str, totem: str, coordenadas: str, cidade: str, estado: str, image: str = None):
-        return self.create_denuncia_use_case.execute(userid, category, content, totem, coordenadas, cidade, estado, image)
+    def create_denuncia(self, userid: str, category: str, content: str, totem: str, coordenadas: str, image: str = None):
+        return self.create_denuncia_use_case.execute(userid, category, content, totem, coordenadas, image)
 
     def get_denuncias_by_area(self, latitude: float, longitude: float, raio: float, categoria: str = None):
         return self.get_denuncias_by_area_use_case.execute(latitude, longitude, raio, categoria)

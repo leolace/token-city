@@ -5,8 +5,19 @@ class DenunciaRepository:
     def __init__(self, connection):
         self.connection = connection
 
-    def create(self, userid: str, category: str, content: str, totem: str, coordenadas: str, cidade: str, estado: str, image: str = None) -> None:
+    def create(self, userid: str, category: str, content: str, totem: str, coordenadas: str, image: str = None) -> None:
         with self.connection.cursor() as cursor:
+            # Buscar cidade e estado do totem
+            cursor.execute(
+                """SELECT NomeCidade, Estado FROM Totem WHERE Numero_Serie = %s""",
+                (totem,)
+            )
+            totem_result = cursor.fetchone()
+            if not totem_result:
+                raise ValueError(f"Totem {totem} não encontrado")
+            
+            cidade, estado = totem_result
+            
             cursor.execute(
                 """SELECT cd.Sigla 
                 FROM Categoria_Departamento cd

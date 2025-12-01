@@ -1,4 +1,4 @@
-interface User {
+export interface User {
   cpf: string;
   nome: string;
   email: string;
@@ -6,6 +6,6 @@ interface User {
 }
 
 export interface Reporter extends User {
-  Saldo_Tokens: string;
-  Status: string;
+  saldo_tokens: number;
+  status: string;
 }

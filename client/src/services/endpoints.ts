@@ -7,4 +7,7 @@ export const endpoints = {
   report: {
     create: `${BASE_URL}/denuncia`,
   },
+  reporter: {
+    profile: (cpf: string) => `${BASE_URL}/denunciante/profile/${cpf}`,
+  },
 };
