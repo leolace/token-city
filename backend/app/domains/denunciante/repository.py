@@ -9,7 +9,23 @@ class DenuncianteRepository:
         with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute("SELECT * FROM Denunciante WHERE Usuario = %s", (usuario_cpf,))
             return cursor.fetchone()
-
+        
+    def get_profile_by_cpf(self, usuario_cpf: str):
+        with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute("""
+            SELECT
+                Usuario.cpf,
+                Usuario.nome,
+                Usuario.email,
+                Denunciante.saldo_tokens,
+                Denunciante.status,
+                Denunciante.usuario
+            FROM Usuario
+            JOIN Denunciante ON Usuario.cpf = Denunciante.usuario
+            WHERE Usuario.cpf = %s
+        """, (usuario_cpf,))
+            return cursor.fetchone()
+        
     def create(self, usuario_cpf: str) -> None:
         with self.connection.cursor() as cursor:
             cursor.execute(
