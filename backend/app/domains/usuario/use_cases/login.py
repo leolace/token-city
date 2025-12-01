@@ -8,7 +8,4 @@ class LoginUseCase:
         usuario = self.usuario_repository.find_by_email_and_password(email, senha)
         if not usuario:
             return None
-        return {
-            "email": usuario["email"],
-            "cpf": usuario["cpf"]
-        }
+        return usuario

@@ -1,5 +1,5 @@
 import { TotemMap } from "@app/components/totem-map";
-import { useLocationStore } from "@app/stores/location-store";
+import { useLocationStore } from "@app/stores/location";
 import { Navigate } from "react-router";
 import { UserCard } from "./components/user-card";
 import { ReportForm } from "./components/report-form";

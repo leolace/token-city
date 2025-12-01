@@ -19,4 +19,5 @@ export default defineConfig({
       "@app": path.resolve(__dirname, "./src"),
     },
   },
+  envPrefix: ["VITE_", "REACT_APP_"],
 });

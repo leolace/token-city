@@ -3,6 +3,8 @@ import type { Dispatch, SetStateAction } from "react";
 
 interface Props extends React.ComponentProps<"input"> {
   onUpload: (files: FileList) => void;
+  maxFiles?: number;
+  images?: File[];
 }
 
 export const FileInput = ({
@@ -11,12 +13,19 @@ export const FileInput = ({
   multiple,
   accept,
   className,
+  maxFiles = 1,
+  images = [],
   ...props
 }: Props) => {
+  const currentCount = images.length;
+  const isDisabled = maxFiles !== undefined && currentCount >= maxFiles;
   return (
     <div
       className={cn(
-        "border-2 border-dashed rounded-lg p-8 text-center hover:border-primary/50 transition-colors cursor-pointer",
+        "border-2 border-dashed rounded-lg p-8 text-center transition-colors",
+        isDisabled
+          ? "opacity-50 cursor-not-allowed"
+          : "hover:border-primary/50 cursor-pointer",
         className
       )}
     >
@@ -26,15 +35,38 @@ export const FileInput = ({
         multiple={multiple}
         accept={accept}
         className="hidden"
+        disabled={isDisabled}
         {...props}
         onChange={(e) => {
-          if (e.target.files) {
-            onUpload(e.target.files);
+          if (e.target.files && !isDisabled) {
+            const filesArray = Array.from(e.target.files);
+            const availableSlots = maxFiles
+              ? maxFiles - currentCount
+              : filesArray.length;
+            const filesToAdd = filesArray.slice(0, availableSlots);
+
+            if (filesToAdd.length > 0) {
+              const dataTransfer = new DataTransfer();
+              filesToAdd.forEach((file) => dataTransfer.items.add(file));
+              onUpload(dataTransfer.files);
+            }
           }
         }}
       />
-      <label htmlFor={id} className="cursor-pointer">
-        <p className="text-muted-foreground">+ Adicionar imagem</p>
+      <label
+        htmlFor={id}
+        className={cn(isDisabled ? "cursor-not-allowed" : "cursor-pointer")}
+      >
+        <p className="text-muted-foreground">
+          {isDisabled
+            ? `Máximo de ${maxFiles} imagens atingido`
+            : "+ Adicionar imagem"}
+        </p>
+        {maxFiles && !isDisabled && (
+          <p className="text-xs text-muted-foreground mt-1">
+            {currentCount}/{maxFiles} imagens
+          </p>
+        )}
       </label>
     </div>
   );
@@ -62,7 +94,7 @@ export const FilePreview = ({ images = [], setImages }: FilePreviewProps) => {
             <button
               type="button"
               onClick={() =>
-                setImages((prev) => prev.filter((_, i) => i !== index))
+                setImages((im) => im.filter((_, i) => i !== index))
               }
               className="absolute top-1 right-1 bg-destructive text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-destructive/90"
             >

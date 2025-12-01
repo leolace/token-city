@@ -13,7 +13,7 @@ import { INITIAL_VIEW_STATE } from "../../utils";
 import { AuthDialog } from "@app/components/totem-map/components/auth-dialog";
 import { cn } from "@app/lib/utils";
 import { useIsDragging } from "../../hooks/is-dragging";
-import { useLocationStore } from "@app/stores/location-store";
+import { useLocationStore } from "@app/stores/location";
 
 export const SelectionToolbar = () => {
   const [viewState, setViewState] = useState(INITIAL_VIEW_STATE);
