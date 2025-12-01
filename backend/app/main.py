@@ -5,6 +5,7 @@ from app.domains.usuario.routing import router as usuario_router
 from app.domains.denuncia.routing import router as denuncia_router
 from app.domains.recompensa.routing import router as recompensa_router
 from app.domains.departamento.routing import router as departamento_router
+from app.domains.denunciante.rounting import router as denunciante_router
 
 app = FastAPI(title="Projeto BD API")
 
@@ -17,6 +18,7 @@ app.include_router(usuario_router)
 app.include_router(denuncia_router)
 app.include_router(recompensa_router)
 app.include_router(departamento_router)
+app.include_router(denunciante_router)
 
 @app.get("/")
 def read_root():
