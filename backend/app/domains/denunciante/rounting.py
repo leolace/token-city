@@ -11,7 +11,7 @@ router = APIRouter(prefix="/denunciante", tags=["denunciante"])
 class GetCPF(BaseModel):
     cpf: str
 
-@router.post("/profile")
+@router.get("/profile")
 def get_denunciante_profile(body: GetCPF, conn=Depends(get_db_connection)):
     denunciante_repository = DenuncianteRepository(conn)
     controller = DenuncianteController(denunciante_repository)
