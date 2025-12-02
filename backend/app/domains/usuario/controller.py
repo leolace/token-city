@@ -3,7 +3,6 @@ from fastapi import HTTPException
 from app.domains.usuario.use_cases.get_denunciante_profile import (
     GetDenuncianteProfileUseCase,
 )
-from app.domains.usuario.use_cases.get_top_denunciante import GetTopDenuncianteUseCase
 from app.domains.usuario.use_cases.login import LoginUseCase
 from app.domains.usuario.use_cases.signup import SignupUseCase
 
@@ -12,9 +11,6 @@ class UsuarioController:
     def __init__(self, usuario_repository, denunciante_repository):
         self.login_use_case = LoginUseCase(usuario_repository)
         self.signup_use_case = SignupUseCase(usuario_repository, denunciante_repository)
-        self.get_top_denunciante_use_case = GetTopDenuncianteUseCase(
-            denunciante_repository
-        )
         self.get_denunciante_profile = GetDenuncianteProfileUseCase(
             denunciante_repository, usuario_repository
         )
