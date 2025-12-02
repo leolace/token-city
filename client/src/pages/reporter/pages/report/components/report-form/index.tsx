@@ -15,13 +15,14 @@ import type { CreateReportForm } from "./types";
 import { useUserStore } from "@app/stores/user";
 import { useReportCreateMutation } from "./hooks";
 import { Input } from "@app/components/primitives/input";
+import { ReportCategory } from "@app/types/report";
 
 const reportCategories = [
-  { id: "Iluminação", label: "Iluminação" },
-  { id: "Buraco", label: "Buraco" },
-  { id: "Lixo", label: "Lixo" },
-  { id: "Calçada", label: "Calçada" },
-  { id: "Sinalização", label: "Sinalização" },
+  { id: ReportCategory.Iluminacao, label: "Iluminação" },
+  { id: ReportCategory.Buraco, label: "Buraco" },
+  { id: ReportCategory.Lixo, label: "Lixo" },
+  { id: ReportCategory.Calcada, label: "Calçada" },
+  { id: ReportCategory.Sinalizacao, label: "Sinalização" },
 ];
 
 const defaultValues: CreateReportForm = {

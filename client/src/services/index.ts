@@ -3,14 +3,22 @@ import { client } from "./client";
 import { endpoints } from "./endpoints";
 import type {
   CreateReportRequest,
+  GetPendingReportsRequest,
   LoginRequest,
   ReporterProfileRequest,
 } from "./request";
 import type {
   CountResponse,
-  Report,
   RepoerterProfileResponse,
+  GetPendingReportsResponse,
+  GetAllTotemsResponse,
 } from "./response";
+import type { GetMostRecentsReportsRequest } from "./request/get-most-recents-reports";
+import type { GetTopReporterResponse } from "./response/get-top-reporter";
+import type {
+  DepartmentsResponse,
+  DepartmentsFullServiceResponse,
+} from "@app/types/department";
 
 export const coreService = {
   login: async (json: LoginRequest) => {
@@ -41,6 +49,20 @@ export const coreService = {
         .json<CountResponse>();
       return data;
     },
+    getPending: async (req: GetPendingReportsRequest) => {
+      const data = await client
+        .post(endpoints.report.pending, { json: req })
+        .json<GetPendingReportsResponse>();
+
+      return data;
+    },
+    getMostRecent: async (req: GetMostRecentsReportsRequest) => {
+      const data = await client
+        .get(endpoints.report.mostRecent(req.state, req.city))
+        .json<GetPendingReportsResponse>();
+
+      return data;
+    },
   },
 
   reporter: {
@@ -51,6 +73,13 @@ export const coreService = {
 
       return data;
     },
+    top: async () => {
+      const data = await client
+        .get(endpoints.reporter.top)
+        .json<GetTopReporterResponse>();
+
+      return data;
+    },
   },
 
   reward: {
@@ -58,6 +87,30 @@ export const coreService = {
       const data = await client
         .get(endpoints.reward.countRedeemed)
         .json<CountResponse>();
+      return data;
+    },
+  },
+
+  totem: {
+    all: async () => {
+      const data = await client
+        .get(endpoints.totem.all)
+        .json<GetAllTotemsResponse>();
+      return data;
+    },
+  },
+
+  department: {
+    byStatus: async () => {
+      const data = await client
+        .get(endpoints.department.byStatus)
+        .json<DepartmentsResponse>();
+      return data;
+    },
+    fullService: async () => {
+      const data = await client
+        .get(endpoints.department.acceptAllCategories)
+        .json<DepartmentsFullServiceResponse>();
       return data;
     },
   },

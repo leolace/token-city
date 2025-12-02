@@ -1,11 +1,13 @@
 from fastapi import HTTPException
 from app.domains.totem.use_cases.get_totem import GetTotemUseCase
 from app.domains.totem.use_cases.verify_distance import VerifyDistanceUseCase
+from app.domains.totem.use_cases.get_all_totems import GetAllTotemsUseCase
 
 class TotemController:
     def __init__(self, totem_repository):
         self.get_totem_use_case = GetTotemUseCase(totem_repository)
         self.verify_distance_use_case = VerifyDistanceUseCase(totem_repository)
+        self.get_all_totems_use_case = GetAllTotemsUseCase(totem_repository)
 
     def get_totem(self, numero_serie: str):
         totem = self.get_totem_use_case.execute(numero_serie)
@@ -16,3 +18,6 @@ class TotemController:
     def verify_distance(self, numero_serie: str, latitude: float, longitude: float):
         result = self.verify_distance_use_case.execute(numero_serie, latitude, longitude)
         return result
+
+    def get_all_totems(self):
+        return self.get_all_totems_use_case.execute()

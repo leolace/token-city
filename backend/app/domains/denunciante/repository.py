@@ -1,5 +1,7 @@
+from typing import Any, Dict
+
 from psycopg2.extras import RealDictCursor
-from typing import Dict, Any
+
 
 class DenuncianteRepository:
     def __init__(self, connection):
@@ -7,12 +9,15 @@ class DenuncianteRepository:
 
     def find_by_usuario(self, usuario_cpf: str) -> Dict[Any, Any]:
         with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
-            cursor.execute("SELECT * FROM Denunciante WHERE Usuario = %s", (usuario_cpf,))
+            cursor.execute(
+                "SELECT * FROM Denunciante WHERE Usuario = %s", (usuario_cpf,)
+            )
             return cursor.fetchone()
-        
+
     def get_profile_by_cpf(self, usuario_cpf: str):
         with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
-            cursor.execute("""
+            cursor.execute(
+                """
             SELECT
                 Usuario.cpf,
                 Usuario.nome,
@@ -23,14 +28,16 @@ class DenuncianteRepository:
             FROM Usuario
             JOIN Denunciante ON Usuario.cpf = Denunciante.usuario
             WHERE Usuario.cpf = %s
-        """, (usuario_cpf,))
+        """,
+                (usuario_cpf,),
+            )
             return cursor.fetchone()
-        
+
     def create(self, usuario_cpf: str) -> None:
         with self.connection.cursor() as cursor:
             cursor.execute(
                 "INSERT INTO Denunciante (Usuario, Saldo_Tokens, Status) VALUES (%s, 0, 'ativo')",
-                (usuario_cpf,)
+                (usuario_cpf,),
             )
             self.connection.commit()
 
@@ -38,7 +45,7 @@ class DenuncianteRepository:
         with self.connection.cursor() as cursor:
             cursor.execute(
                 "UPDATE Denunciante SET Saldo_Tokens = Saldo_Tokens - %s WHERE Usuario = %s",
-                (valor, usuario_cpf)
+                (valor, usuario_cpf),
             )
             self.connection.commit()
 

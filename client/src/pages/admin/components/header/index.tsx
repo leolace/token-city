@@ -1,9 +1,11 @@
 import { Card, CardContent } from "@app/components/primitives/card";
 import { cn } from "@app/lib/utils";
-import { NavLink } from "react-router";
+import { Link, NavLink } from "react-router";
 
 const navItems = [
   { label: "Denúncias", path: "/admin/denuncias" },
+  { label: "Denunciantes", path: "/admin/denunciantes" },
+  { label: "Totems", path: "/admin/totems" },
   { label: "Recompensas", path: "/admin/recompensas" },
   { label: "Categorias", path: "/admin/categorias" },
   { label: "Departamentos", path: "/admin/departamentos" },
@@ -12,8 +14,10 @@ const navItems = [
 export const AdminHeader = () => {
   return (
     <Card className="rounded-none border-x-0 border-t-0 bg-sidebar-primary text-sidebar-primary-foreground">
-      <CardContent className="p-6 grid justify-items-center gap-4">
-        <h1 className="text-2xl font-bold">Token City - Admin</h1>
+      <CardContent className="grid justify-items-center gap-4">
+        <h1 className="text-2xl font-bold">
+          <Link to="/admin/dashboard">Token City - Admin</Link>
+        </h1>
         <nav className="flex gap-4 flex-wrap">
           {navItems.map((item) => (
             <NavLink
@@ -24,7 +28,7 @@ export const AdminHeader = () => {
                   "px-4 py-2 rounded-lg transition-colors",
                   isActive
                     ? "bg-primary text-primary-foreground"
-                    : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                    : "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                 )
               }
             >

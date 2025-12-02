@@ -3,6 +3,9 @@ import { useLocationStore } from "@app/stores/location";
 import { Navigate } from "react-router";
 import { UserCard } from "./components/user-card";
 import { ReportForm } from "./components/report-form";
+import { MapPin } from "@app/components/map-pin";
+import { TotemMark } from "@app/components/totem-mark";
+import { CAASO_TOTEM } from "../../utils";
 
 export const ReportPage = () => {
   const { latitude, longitude } = useLocationStore();
@@ -18,11 +21,17 @@ export const ReportPage = () => {
 
       <div className="sticky top-0 h-screen w-full">
         <TotemMap
-          disableSelection
           autoRotate={{ rotationSpeed: 1 }}
           latitude={latitude}
           longitude={longitude}
-        />
+        >
+          <TotemMark
+            latitude={CAASO_TOTEM.latitude}
+            longitude={CAASO_TOTEM.longitude}
+            tooltip={{ content: "Você", options: { defaultOpen: true } }}
+          />
+          <MapPin />
+        </TotemMap>
       </div>
     </div>
   );

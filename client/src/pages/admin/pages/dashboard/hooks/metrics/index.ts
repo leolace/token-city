@@ -1,13 +1,6 @@
 import { coreService } from "@app/services";
 import { useQuery } from "@tanstack/react-query";
 
-export const useAllDenuncias = () => {
-  return useQuery({
-    queryKey: ["denuncias", "all"],
-    queryFn: () => coreService.report.all(),
-  });
-};
-
 export const useDenunciasResolvidas = () => {
   return useQuery({
     queryKey: ["denuncias", "count", "resolvidas"],

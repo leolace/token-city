@@ -12,8 +12,9 @@ class GetDenunciasByAreaUseCase:
                     "descricao": d["descricao"],
                     "coordenadas": d["coordenadas"],
                     "status": d["status"],
-                    "dataRegistro": str(d["data_registro"]),
-                    "nomeUsuario": d["nome_usuario_denunciante"]
+                    "data": str(d["data_registro"]),
+                    "nomeUsuario": d["nome_usuario_denunciante"],
+                    "categoria": d["categoria"],
                 }
                 for d in denuncias
             ]

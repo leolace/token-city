@@ -1,64 +1,75 @@
+from typing import Any, Dict, List
+
 from psycopg2.extras import RealDictCursor
-from typing import List, Dict, Any
+
 
 class DenunciaRepository:
     def __init__(self, connection):
         self.connection = connection
 
-    def create(self, userid: str, category: str, content: str, totem: str, coordenadas: str, image: str = None) -> None:
+    def create(
+        self,
+        userid: str,
+        category: str,
+        content: str,
+        totem: str,
+        coordenadas: str,
+        image: str = None,
+    ) -> None:
         with self.connection.cursor() as cursor:
             # Buscar cidade e estado do totem
             cursor.execute(
                 """SELECT NomeCidade, Estado FROM Totem WHERE Numero_Serie = %s""",
-                (totem,)
+                (totem,),
             )
             totem_result = cursor.fetchone()
             if not totem_result:
                 raise ValueError(f"Totem {totem} não encontrado")
-            
+
             cidade, estado = totem_result
-            
+
             cursor.execute(
-                """SELECT cd.Sigla 
+                """SELECT cd.Sigla
                 FROM Categoria_Departamento cd
                 INNER JOIN Departamento d ON cd.Sigla = d.Sigla
                 WHERE cd.Categoria = %s AND d.NomeCidade = %s AND d.Estado = %s
                 LIMIT 1""",
-                (category, cidade, estado)
+                (category, cidade, estado),
             )
             result = cursor.fetchone()
             sigla = result[0] if result else None
-            
+
             cursor.execute(
-                """INSERT INTO Denuncia 
+                """INSERT INTO Denuncia
                 (Categoria, Usuario, Totem, Data, Coordenadas, Descricao, Valida, Prioridade, Sigla)
                 VALUES (%s, %s, %s, CURRENT_DATE, %s, %s, FALSE, 1, %s)""",
-                (category, userid, totem, coordenadas, content, sigla)
+                (category, userid, totem, coordenadas, content, sigla),
             )
-            
+
             cursor.execute(
-                """INSERT INTO Historico_Denuncia 
+                """INSERT INTO Historico_Denuncia
                 (Usuario, Data, Coordenadas, Status)
                 VALUES (%s, CURRENT_DATE, %s, 'Registrada')""",
-                (userid, coordenadas)
+                (userid, coordenadas),
             )
-            
+
             if image:
                 cursor.execute(
-                    """INSERT INTO Midia 
+                    """INSERT INTO Midia
                     (URL, Usuario, Data, Coordenadas, Tipo)
                     VALUES (%s, %s, CURRENT_DATE, %s, 'imagem')""",
-                    (image, userid, coordenadas)
+                    (image, userid, coordenadas),
                 )
-            
+
             self.connection.commit()
 
-    def find_by_area_and_status(self, latitude: float, longitude: float, raio: float, categoria: str = None) -> List[Dict[Any, Any]]:
+    def find_by_area_and_status(
+        self, latitude: float, longitude: float, raio: float, categoria: str = None
+    ) -> List[Dict[Any, Any]]:
         with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
             query = """
                 SELECT
-                    D.Descricao,
-                    D.Coordenadas,
+                    D.*,
                     HD.Status,
                     D.Data AS Data_Registro,
                     U.Nome AS Nome_Usuario_Denunciante
@@ -74,13 +85,13 @@ class DenunciaRepository:
                 WHERE
                     HD.Status IN ('Registrada', 'Em Validação', 'Em Andamento')
             """
-            
+
             params = []
-            
+
             if categoria:
                 query += " AND D.Categoria = %s"
                 params.append(categoria)
-            
+
             query += """
                 AND ST_DWithin(
                     ST_SetSRID(
@@ -95,7 +106,7 @@ class DenunciaRepository:
                 )
             """
             params.extend([latitude, longitude, raio])
-            
+
             cursor.execute(query, tuple(params))
             return cursor.fetchall()
 
@@ -122,11 +133,15 @@ class DenunciaRepository:
             """)
             return cursor.fetchall()
 
-    def find_most_recent_by_city(self, nome_cidade: str, sigla_estado: str) -> List[Dict[Any, Any]]:
+    def find_most_recent_by_city(
+        self, nome_cidade: str, sigla_estado: str
+    ) -> List[Dict[Any, Any]]:
         with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT
                     U.Nome AS nomeDenunciante,
+                    D_RE.*,
                     D_RE.Descricao AS descricao,
                     H.Status AS statusAtual,
                     D_RE.Data AS dataRegistro
@@ -159,7 +174,9 @@ class DenunciaRepository:
                     )
                 ORDER BY
                     U.Nome
-            """, (nome_cidade, sigla_estado))
+            """,
+                (nome_cidade, sigla_estado),
+            )
             return cursor.fetchall()
 
     def find_all(self) -> List[Dict[Any, Any]]:
@@ -190,7 +207,8 @@ class DenunciaRepository:
 
     def count_by_status(self, status: str) -> int:
         with self.connection.cursor() as cursor:
-            cursor.execute("""
+            cursor.execute(
+                """
                 SELECT COUNT(*)
                 FROM Denuncia AS D
                 INNER JOIN Historico_Denuncia AS H
@@ -198,6 +216,8 @@ class DenunciaRepository:
                     AND D.Data = H.Data
                     AND D.Coordenadas = H.Coordenadas
                 WHERE H.Status = %s
-            """, (status,))
+            """,
+                (status,),
+            )
             result = cursor.fetchone()
             return result[0] if result else 0

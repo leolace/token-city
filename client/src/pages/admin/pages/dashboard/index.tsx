@@ -1,10 +1,10 @@
 import { Card, CardContent } from "@app/components/primitives/card";
 import {
-  useAllDenuncias,
   useDenunciasPendentes,
   useDenunciasResolvidas,
   useRecompensasResgatadas,
 } from "./hooks/metrics";
+import { useAllDenuncias } from "@app/hooks/reports";
 
 export const DashboardPage = () => {
   const { data: allDenuncias } = useAllDenuncias();

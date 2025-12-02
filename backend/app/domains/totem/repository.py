@@ -1,6 +1,6 @@
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, List
 
 class TotemRepository:
     def __init__(self, connection):
@@ -13,3 +13,8 @@ class TotemRepository:
                 (numero_serie,)
             )
             return cursor.fetchone()
+
+    def find_all(self) -> List[Dict[Any, Any]]:
+        with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute("SELECT * FROM Totem ORDER BY Numero_Serie")
+            return cursor.fetchall()

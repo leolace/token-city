@@ -10,6 +10,12 @@ class VerifyDistanceRequest(BaseModel):
     latitude: float
     longitude: float
 
+@router.get("")
+def get_all_totems(conn=Depends(get_db_connection)):
+    repository = TotemRepository(conn)
+    controller = TotemController(repository)
+    return controller.get_all_totems()
+
 @router.get("/{numero_serie}")
 def get_totem(numero_serie: str, conn=Depends(get_db_connection)):
     repository = TotemRepository(conn)
