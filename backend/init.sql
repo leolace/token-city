@@ -63,7 +63,7 @@ CREATE TABLE Categoria_Departamento (
     CONSTRAINT CK_categoria_atendida CHECK (Categoria IS NOT NULL)
 );
 
--- Criação da tabela funcionario 
+-- Criação da tabela funcionario
 CREATE TABLE Funcionario (
     Usuario CHAR(11) NOT NULL PRIMARY KEY,
     Matricula CHAR(11) NOT NULL,

@@ -30,7 +30,7 @@ class DenunciasByAreaRequest(BaseModel):
     category: Optional[str] = None
 
 
-@router.post("")
+@router.post("", status_code=201, response_model=None)
 def create_denuncia(request: CreateDenunciaRequest, conn=Depends(get_db_connection)):
     repository = DenunciaRepository(conn)
     controller = DenunciaController(repository)

@@ -48,8 +48,8 @@ class DenunciaRepository:
 
             cursor.execute(
                 """INSERT INTO Historico_Denuncia
-                (Usuario, Data, Coordenadas, Status)
-                VALUES (%s, CURRENT_DATE, %s, 'Registrada')""",
+                (Usuario, Data_Emissao_Denuncia, Coordenadas, Data_Historico, Status)
+                VALUES (%s, CURRENT_DATE, %s, CURRENT_DATE, 'Registrada')""",
                 (userid, coordenadas),
             )
 
@@ -78,7 +78,7 @@ class DenunciaRepository:
                 JOIN
                     Historico_Denuncia AS HD ON
                         D.Usuario = HD.Usuario AND
-                        D.Data = HD.Data AND
+                        D.Data = HD.Data_Emissao_Denuncia AND
                         D.Coordenadas = HD.Coordenadas
                 JOIN
                     Usuario AS U ON D.Usuario = U.CPF
@@ -122,7 +122,7 @@ class DenunciaRepository:
                 INNER JOIN
                     Historico_Denuncia AS H
                     ON D.Usuario = H.Usuario
-                    AND D.Data = H.Data
+                    AND D.Data = H.Data_Emissao_Denuncia
                     AND D.Coordenadas = H.Coordenadas
                 GROUP BY
                     D.Sigla,
@@ -152,7 +152,7 @@ class DenunciaRepository:
                 INNER JOIN
                     Historico_Denuncia AS H
                     ON D_RE.Usuario = H.Usuario
-                    AND D_RE.Data = H.Data
+                    AND D_RE.Data = H.Data_Emissao_Denuncia
                     AND D_RE.Coordenadas = H.Coordenadas
                 WHERE
                     D_RE.Data = (
@@ -197,7 +197,7 @@ class DenunciaRepository:
                 INNER JOIN
                     Historico_Denuncia AS H
                     ON D.Usuario = H.Usuario
-                    AND D.Data = H.Data
+                    AND D.Data = H.Data_Emissao_Denuncia
                     AND D.Coordenadas = H.Coordenadas
                 INNER JOIN
                     Usuario AS U ON D.Usuario = U.CPF
@@ -213,7 +213,7 @@ class DenunciaRepository:
                 FROM Denuncia AS D
                 INNER JOIN Historico_Denuncia AS H
                     ON D.Usuario = H.Usuario
-                    AND D.Data = H.Data
+                    AND D.Data = H.Data_Emissao_Denuncia
                     AND D.Coordenadas = H.Coordenadas
                 WHERE H.Status = %s
             """,
