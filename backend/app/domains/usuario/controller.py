@@ -4,12 +4,14 @@ from app.domains.usuario.use_cases.get_denunciante_profile import (
     GetDenuncianteProfileUseCase,
 )
 from app.domains.usuario.use_cases.login import LoginUseCase
+from app.domains.usuario.use_cases.login_operador import LoginOperadorUseCase
 from app.domains.usuario.use_cases.signup import SignupUseCase
 
 
 class UsuarioController:
     def __init__(self, usuario_repository, denunciante_repository):
         self.login_use_case = LoginUseCase(usuario_repository)
+        self.login_operador_use_case = LoginOperadorUseCase(usuario_repository)
         self.signup_use_case = SignupUseCase(usuario_repository, denunciante_repository)
         self.get_denunciante_profile = GetDenuncianteProfileUseCase(
             denunciante_repository, usuario_repository
@@ -19,6 +21,12 @@ class UsuarioController:
         usuario = self.login_use_case.execute(email, senha)
         if not usuario:
             raise HTTPException(status_code=401, detail="Credenciais inválidas")
+        return usuario
+
+    def login_operador(self, matricula: str, senha: str):
+        usuario = self.login_operador_use_case.execute(matricula, senha)
+        if not usuario:
+            raise HTTPException(status_code=401, detail="Matrícula ou senha inválida")
         return usuario
 
     def signup(self, cpf: str, nome: str, senha: str, email: str):

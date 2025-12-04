@@ -6,6 +6,7 @@ from pydantic import BaseModel
 from app.database import get_db_connection
 from app.domains.denuncia.controller import DenunciaController
 from app.domains.denuncia.repository import DenunciaRepository
+from app.domains.denunciante.repository import DenuncianteRepository
 
 router = APIRouter(prefix="/denuncia", tags=["denuncia"])
 
@@ -28,6 +29,14 @@ class DenunciasByAreaRequest(BaseModel):
     coordinates: Coordinates
     radius: float
     category: Optional[str] = None
+
+
+class UpdateStatusRequest(BaseModel):
+    usuario: str
+    data: str
+    coordenadas: str
+    novo_status: str
+    matricula_funcionario: str
 
 
 @router.post("", status_code=201, response_model=None)
@@ -79,6 +88,18 @@ def get_all_denuncias(conn=Depends(get_db_connection)):
     return repository.find_all()
 
 
+@router.get("/departamento/{sigla}")
+def get_denuncias_by_department(sigla: str, conn=Depends(get_db_connection)):
+    repository = DenunciaRepository(conn)
+    return repository.find_by_department(sigla)
+
+
+@router.post("/departamentos")
+def get_denuncias_by_departments(siglas: list[str], conn=Depends(get_db_connection)):
+    repository = DenunciaRepository(conn)
+    return repository.find_by_departments(siglas)
+
+
 @router.get("/count/resolvidas")
 def count_denuncias_resolvidas(conn=Depends(get_db_connection)):
     repository = DenunciaRepository(conn)
@@ -89,10 +110,19 @@ def count_denuncias_resolvidas(conn=Depends(get_db_connection)):
 @router.get("/count/pendentes")
 def count_denuncias_pendentes(conn=Depends(get_db_connection)):
     repository = DenunciaRepository(conn)
-    # Contar denúncias com status diferente de 'Resolvida'
     total = (
         repository.count_by_status("Registrada")
         + repository.count_by_status("Em Validação")
         + repository.count_by_status("Em Andamento")
     )
     return {"count": total}
+
+
+@router.patch("/status")
+def update_status(request: UpdateStatusRequest, conn=Depends(get_db_connection)):
+    denuncia_repository = DenunciaRepository(conn)
+    denunciante_repository = DenuncianteRepository(conn)
+    controller = DenunciaController(denuncia_repository, denunciante_repository)
+    return controller.update_status(
+        request.usuario, request.data, request.coordenadas, request.novo_status, request.matricula_funcionario
+    )

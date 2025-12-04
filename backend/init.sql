@@ -70,12 +70,10 @@ CREATE TABLE Funcionario (
     Data_admissao DATE NOT NULL,
     Cargo VARCHAR(100) NOT NULL,
     Nivel VARCHAR(15) NOT NULL CHECK(Nivel in('ADMINISTRADOR', 'OPERADOR')),
-    Sigla VARCHAR(10) NOT NULL,
 
     UNIQUE (Matricula),
 
-    FOREIGN KEY (Usuario) REFERENCES Usuario(CPF) ON DELETE CASCADE,
-    FOREIGN KEY (Sigla) REFERENCES Departamento(Sigla) ON DELETE CASCADE
+    FOREIGN KEY (Usuario) REFERENCES Usuario(CPF) ON DELETE CASCADE
 );
 
 -- Criação da tabela Operador
@@ -161,10 +159,10 @@ CREATE TABLE Historico_Denuncia (
     Usuario CHAR(11) NOT NULL,
     Coordenadas TipoCoordenadas NOT NULL,
     Data_Emissao_Denuncia DATE NOT NULL,
-    Data_Historico DATE NOT NULL DEFAULT(now()),
-    Status VARCHAR(50) NOT NULL,
+    Data_Historico TIMESTAMP NOT NULL DEFAULT(now()),
+    Status VARCHAR(50) NOT NULL CHECK (Status IN ('Registrada', 'Em Validação', 'Em Andamento', 'Resolvida', 'Rejeitada')),
 
-    PRIMARY KEY (Usuario, Data_Emissao_Denuncia, Coordenadas, Data_Historico),
+    PRIMARY KEY (Usuario, Data_Emissao_Denuncia, Coordenadas, Status),
 
     FOREIGN KEY (Usuario, Data_Emissao_Denuncia, Coordenadas)
         REFERENCES Denuncia(Usuario, Data, Coordenadas)

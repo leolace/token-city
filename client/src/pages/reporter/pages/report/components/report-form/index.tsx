@@ -15,15 +15,10 @@ import type { CreateReportForm } from "./types";
 import { useUserStore } from "@app/stores/user";
 import { useReportCreateMutation } from "./hooks";
 import { Input } from "@app/components/primitives/input";
-import { ReportCategory } from "@app/types/report";
-
-const reportCategories = [
-  { id: ReportCategory.Iluminacao, label: "Iluminação" },
-  { id: ReportCategory.Buraco, label: "Buraco" },
-  { id: ReportCategory.Lixo, label: "Lixo" },
-  { id: ReportCategory.Calcada, label: "Calçada" },
-  { id: ReportCategory.Sinalizacao, label: "Sinalização" },
-];
+import { useQuery } from "@tanstack/react-query";
+import { client } from "@app/services/client";
+import { endpoints } from "@app/services/endpoints";
+import { Spinner } from "@app/components/primitives/spinner";
 
 const defaultValues: CreateReportForm = {
   content: "",
@@ -36,6 +31,16 @@ export const ReportForm = () => {
   const { reporter } = useUserStore();
   const { latitude, longitude } = useLocationStore();
   const { reportCreateMutate } = useReportCreateMutation();
+
+  const totemId = "TOTEM004"; // TODO: Determinar totem baseado na localização
+
+  const { data: categories, isLoading: loadingCategories } = useQuery({
+    queryKey: ["categories", "totem", totemId],
+    queryFn: async () => {
+      const data = await client.get(endpoints.department.categoriesByTotem(totemId)).json<Array<{ nome: string }>>();
+      return data;
+    },
+  });
 
   const form = useForm({
     defaultValues,
@@ -58,7 +63,7 @@ export const ReportForm = () => {
           category: value.category,
           content: value.content,
           image: value.image,
-          totem: "TOTEM001",
+          totem: totemId,
         },
         {
           onSuccess: () => {
@@ -104,17 +109,23 @@ export const ReportForm = () => {
             name="category"
             children={(field) => (
               <div className="flex flex-wrap gap-2">
-                {reportCategories.map((category) => (
-                  <Toggle
-                    key={category.id}
-                    variant="outline"
-                    pressed={field.state.value === category.id}
-                    onPressedChange={() => field.handleChange(category.id)}
-                    size="xl"
-                  >
-                    {category.label}
-                  </Toggle>
-                ))}
+                {loadingCategories ? (
+                  <div className="flex justify-center w-full py-4">
+                    <Spinner />
+                  </div>
+                ) : (
+                  categories?.map((category) => (
+                    <Toggle
+                      key={category.nome}
+                      variant="outline"
+                      pressed={field.state.value === category.nome}
+                      onPressedChange={() => field.handleChange(category.nome)}
+                      size="xl"
+                    >
+                      {category.nome}
+                    </Toggle>
+                  ))
+                )}
               </div>
             )}
           />

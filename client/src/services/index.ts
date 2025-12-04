@@ -37,6 +37,10 @@ export const coreService = {
       const data = await client.get(endpoints.report.all).json<Report[]>();
       return data;
     },
+    byDepartment: async (sigla: string) => {
+      const data = await client.get(endpoints.report.byDepartment(sigla)).json<Report[]>();
+      return data;
+    },
     countResolved: async () => {
       const data = await client
         .get(endpoints.report.countResolved)

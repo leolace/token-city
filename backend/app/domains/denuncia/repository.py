@@ -1,5 +1,6 @@
 from typing import Any, Dict, List
 
+from fastapi import HTTPException
 from psycopg2.extras import RealDictCursor
 
 
@@ -17,14 +18,13 @@ class DenunciaRepository:
         image: str = None,
     ) -> None:
         with self.connection.cursor() as cursor:
-            # Buscar cidade e estado do totem
             cursor.execute(
                 """SELECT NomeCidade, Estado FROM Totem WHERE Numero_Serie = %s""",
                 (totem,),
             )
             totem_result = cursor.fetchone()
             if not totem_result:
-                raise ValueError(f"Totem {totem} não encontrado")
+                raise HTTPException(status_code=404, detail=f"Totem {totem} não encontrado")
 
             cidade, estado = totem_result
 
@@ -49,7 +49,7 @@ class DenunciaRepository:
             cursor.execute(
                 """INSERT INTO Historico_Denuncia
                 (Usuario, Data_Emissao_Denuncia, Coordenadas, Data_Historico, Status)
-                VALUES (%s, CURRENT_DATE, %s, CURRENT_DATE, 'Registrada')""",
+                VALUES (%s, CURRENT_DATE, %s, CURRENT_TIMESTAMP, 'Registrada')""",
                 (userid, coordenadas),
             )
 
@@ -68,22 +68,24 @@ class DenunciaRepository:
     ) -> List[Dict[Any, Any]]:
         with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
             query = """
+                WITH UltimoStatus AS (
+                    SELECT DISTINCT ON (Usuario, Data_Emissao_Denuncia, Coordenadas)
+                        Usuario, Data_Emissao_Denuncia, Coordenadas, Status
+                    FROM Historico_Denuncia
+                    ORDER BY Usuario, Data_Emissao_Denuncia, Coordenadas, Data_Historico DESC
+                )
                 SELECT
                     D.*,
-                    HD.Status,
+                    US.Status,
                     D.Data AS Data_Registro,
                     U.Nome AS Nome_Usuario_Denunciante
-                FROM
-                    Denuncia AS D
-                JOIN
-                    Historico_Denuncia AS HD ON
-                        D.Usuario = HD.Usuario AND
-                        D.Data = HD.Data_Emissao_Denuncia AND
-                        D.Coordenadas = HD.Coordenadas
-                JOIN
-                    Usuario AS U ON D.Usuario = U.CPF
-                WHERE
-                    HD.Status IN ('Registrada', 'Em Validação', 'Em Andamento')
+                FROM Denuncia AS D
+                JOIN UltimoStatus US ON
+                    D.Usuario = US.Usuario AND
+                    D.Data = US.Data_Emissao_Denuncia AND
+                    D.Coordenadas = US.Coordenadas
+                JOIN Usuario AS U ON D.Usuario = U.CPF
+                WHERE US.Status IN ('Registrada', 'Em Validação', 'Em Andamento')
             """
 
             params = []
@@ -113,23 +115,23 @@ class DenunciaRepository:
     def get_metrics_by_department(self) -> List[Dict[Any, Any]]:
         with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute("""
+                WITH UltimoStatus AS (
+                    SELECT DISTINCT ON (Usuario, Data_Emissao_Denuncia, Coordenadas)
+                        Usuario, Data_Emissao_Denuncia, Coordenadas, Status
+                    FROM Historico_Denuncia
+                    ORDER BY Usuario, Data_Emissao_Denuncia, Coordenadas, Data_Historico DESC
+                )
                 SELECT
                     D.Sigla AS Sigla_Departamento,
-                    H.Status AS Status_Atual,
+                    US.Status AS Status_Atual,
                     COUNT(D.Usuario) AS Total_Denuncias_Por_Status
-                FROM
-                    Denuncia AS D
-                INNER JOIN
-                    Historico_Denuncia AS H
-                    ON D.Usuario = H.Usuario
-                    AND D.Data = H.Data_Emissao_Denuncia
-                    AND D.Coordenadas = H.Coordenadas
-                GROUP BY
-                    D.Sigla,
-                    H.Status
-                ORDER BY
-                    D.Sigla,
-                    Total_Denuncias_Por_Status DESC
+                FROM Denuncia AS D
+                INNER JOIN UltimoStatus US ON
+                    D.Usuario = US.Usuario AND
+                    D.Data = US.Data_Emissao_Denuncia AND
+                    D.Coordenadas = US.Coordenadas
+                GROUP BY D.Sigla, US.Status
+                ORDER BY D.Sigla, Total_Denuncias_Por_Status DESC
             """)
             return cursor.fetchall()
 
@@ -139,23 +141,25 @@ class DenunciaRepository:
         with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(
                 """
+                WITH UltimoStatus AS (
+                    SELECT DISTINCT ON (Usuario, Data_Emissao_Denuncia, Coordenadas)
+                        Usuario, Data_Emissao_Denuncia, Coordenadas, Status
+                    FROM Historico_Denuncia
+                    ORDER BY Usuario, Data_Emissao_Denuncia, Coordenadas, Data_Historico DESC
+                )
                 SELECT
                     U.Nome AS nomeDenunciante,
                     D_RE.*,
                     D_RE.Descricao AS descricao,
-                    H.Status AS statusAtual,
+                    US.Status AS statusAtual,
                     D_RE.Data AS dataRegistro
-                FROM
-                    Denuncia AS D_RE
-                INNER JOIN
-                    Usuario AS U ON D_RE.Usuario = U.CPF
-                INNER JOIN
-                    Historico_Denuncia AS H
-                    ON D_RE.Usuario = H.Usuario
-                    AND D_RE.Data = H.Data_Emissao_Denuncia
-                    AND D_RE.Coordenadas = H.Coordenadas
-                WHERE
-                    D_RE.Data = (
+                FROM Denuncia AS D_RE
+                INNER JOIN Usuario AS U ON D_RE.Usuario = U.CPF
+                INNER JOIN UltimoStatus US ON
+                    D_RE.Usuario = US.Usuario AND
+                    D_RE.Data = US.Data_Emissao_Denuncia AND
+                    D_RE.Coordenadas = US.Coordenadas
+                WHERE D_RE.Data = (
                         SELECT
                             MAX(D_CORR.Data)
                         FROM
@@ -182,6 +186,12 @@ class DenunciaRepository:
     def find_all(self) -> List[Dict[Any, Any]]:
         with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute("""
+                WITH UltimoStatus AS (
+                    SELECT DISTINCT ON (Usuario, Data_Emissao_Denuncia, Coordenadas)
+                        Usuario, Data_Emissao_Denuncia, Coordenadas, Status
+                    FROM Historico_Denuncia
+                    ORDER BY Usuario, Data_Emissao_Denuncia, Coordenadas, Data_Historico DESC
+                )
                 SELECT
                     D.Categoria,
                     D.Usuario,
@@ -190,34 +200,155 @@ class DenunciaRepository:
                     D.Descricao,
                     D.Valida,
                     D.Prioridade,
-                    H.Status,
+                    US.Status,
                     U.Nome AS NomeUsuario
-                FROM
-                    Denuncia AS D
-                INNER JOIN
-                    Historico_Denuncia AS H
-                    ON D.Usuario = H.Usuario
-                    AND D.Data = H.Data_Emissao_Denuncia
-                    AND D.Coordenadas = H.Coordenadas
-                INNER JOIN
-                    Usuario AS U ON D.Usuario = U.CPF
+                FROM Denuncia AS D
+                INNER JOIN UltimoStatus US ON
+                    D.Usuario = US.Usuario AND
+                    D.Data = US.Data_Emissao_Denuncia AND
+                    D.Coordenadas = US.Coordenadas
+                INNER JOIN Usuario AS U ON D.Usuario = U.CPF
                 ORDER BY D.Data DESC
             """)
+            return cursor.fetchall()
+
+    def find_by_department(self, sigla_departamento: str) -> List[Dict[Any, Any]]:
+        with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute("""
+                WITH UltimoStatus AS (
+                    SELECT DISTINCT ON (Usuario, Data_Emissao_Denuncia, Coordenadas)
+                        Usuario, Data_Emissao_Denuncia, Coordenadas, Status
+                    FROM Historico_Denuncia
+                    ORDER BY Usuario, Data_Emissao_Denuncia, Coordenadas, Data_Historico DESC
+                )
+                SELECT
+                    D.Categoria,
+                    D.Usuario,
+                    D.Data,
+                    D.Coordenadas,
+                    D.Descricao,
+                    D.Valida,
+                    D.Prioridade,
+                    D.Sigla,
+                    US.Status,
+                    U.Nome AS NomeUsuario
+                FROM Denuncia AS D
+                INNER JOIN UltimoStatus US ON
+                    D.Usuario = US.Usuario AND
+                    D.Data = US.Data_Emissao_Denuncia AND
+                    D.Coordenadas = US.Coordenadas
+                INNER JOIN Usuario AS U ON D.Usuario = U.CPF
+                WHERE D.Sigla = %s 
+                  AND US.Status NOT IN ('Resolvida', 'Rejeitada')
+                ORDER BY D.Data DESC
+            """, (sigla_departamento,))
+            return cursor.fetchall()
+
+    def find_by_departments(self, siglas_departamentos: List[str]) -> List[Dict[Any, Any]]:
+        with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute("""
+                WITH UltimoStatus AS (
+                    SELECT DISTINCT ON (Usuario, Data_Emissao_Denuncia, Coordenadas)
+                        Usuario, Data_Emissao_Denuncia, Coordenadas, Status
+                    FROM Historico_Denuncia
+                    ORDER BY Usuario, Data_Emissao_Denuncia, Coordenadas, Data_Historico DESC
+                )
+                SELECT
+                    D.Categoria,
+                    D.Usuario,
+                    D.Data,
+                    D.Coordenadas,
+                    D.Descricao,
+                    D.Valida,
+                    D.Prioridade,
+                    D.Sigla,
+                    US.Status,
+                    U.Nome AS NomeUsuario,
+                    (SELECT M.URL 
+                     FROM Midia M 
+                     WHERE M.Usuario = D.Usuario 
+                       AND M.Data = D.Data 
+                       AND M.Coordenadas = D.Coordenadas 
+                     LIMIT 1) AS Imagem
+                FROM Denuncia AS D
+                INNER JOIN UltimoStatus US ON
+                    D.Usuario = US.Usuario AND
+                    D.Data = US.Data_Emissao_Denuncia AND
+                    D.Coordenadas = US.Coordenadas
+                INNER JOIN Usuario AS U ON D.Usuario = U.CPF
+                WHERE D.Sigla = ANY(%s)
+                  AND US.Status NOT IN ('Resolvida', 'Rejeitada')
+                ORDER BY D.Data DESC
+            """, (siglas_departamentos,))
             return cursor.fetchall()
 
     def count_by_status(self, status: str) -> int:
         with self.connection.cursor() as cursor:
             cursor.execute(
                 """
+                WITH UltimoStatus AS (
+                    SELECT DISTINCT ON (Usuario, Data_Emissao_Denuncia, Coordenadas)
+                        Usuario, Data_Emissao_Denuncia, Coordenadas, Status
+                    FROM Historico_Denuncia
+                    ORDER BY Usuario, Data_Emissao_Denuncia, Coordenadas, Data_Historico DESC
+                )
                 SELECT COUNT(*)
                 FROM Denuncia AS D
-                INNER JOIN Historico_Denuncia AS H
-                    ON D.Usuario = H.Usuario
-                    AND D.Data = H.Data_Emissao_Denuncia
-                    AND D.Coordenadas = H.Coordenadas
-                WHERE H.Status = %s
+                INNER JOIN UltimoStatus US ON
+                    D.Usuario = US.Usuario AND
+                    D.Data = US.Data_Emissao_Denuncia AND
+                    D.Coordenadas = US.Coordenadas
+                WHERE US.Status = %s
             """,
                 (status,),
             )
             result = cursor.fetchone()
             return result[0] if result else 0
+
+    def find_by_id(
+        self, usuario: str, data: str, coordenadas: str
+    ) -> bool:
+        with self.connection.cursor() as cursor:
+            cursor.execute(
+                """SELECT 1 FROM Denuncia
+                WHERE Usuario = %s AND Data = %s AND Coordenadas = %s""",
+                (usuario, data, coordenadas),
+            )
+            return cursor.fetchone() is not None
+
+    def get_current_status(
+        self, usuario: str, data: str, coordenadas: str
+    ) -> str:
+        with self.connection.cursor() as cursor:
+            cursor.execute(
+                """SELECT Status FROM Historico_Denuncia
+                WHERE Usuario = %s AND Data_Emissao_Denuncia = %s AND Coordenadas = %s
+                ORDER BY Data_Historico DESC
+                LIMIT 1""",
+                (usuario, data, coordenadas),
+            )
+            result = cursor.fetchone()
+            return result[0] if result else None
+
+    def update_status(
+        self, usuario: str, data: str, coordenadas: str, novo_status: str, matricula_funcionario: str
+    ) -> None:
+        with self.connection.cursor() as cursor:
+            cursor.execute(
+                """INSERT INTO Historico_Denuncia
+                (Usuario, Data_Emissao_Denuncia, Coordenadas, Data_Historico, Status)
+                VALUES (%s, %s, %s, CURRENT_TIMESTAMP, %s)""",
+                (usuario, data, coordenadas, novo_status),
+            )
+
+            # Registra na tabela FuncionarioDenuncia
+            cursor.execute(
+                """INSERT INTO FuncionarioDenuncia
+                (Matricula, Usuario_Denunciante, Data_Denuncia, Coordenadas, Atuacao)
+                VALUES (%s, %s, %s, %s, %s)
+                ON CONFLICT (Matricula, Usuario_Denunciante, Data_Denuncia, Coordenadas)
+                DO UPDATE SET Atuacao = EXCLUDED.Atuacao""",
+                (matricula_funcionario, usuario, data, coordenadas, novo_status),
+            )
+
+            self.connection.commit()

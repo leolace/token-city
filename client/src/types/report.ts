@@ -11,10 +11,12 @@ export type ReportCategory =
 
 export interface Report {
   categoria: ReportCategory;
-  nomeUsuario: string;
+  nomeusuario: string;
+  usuario: string;
   data: string;
   coordenadas: string;
   descricao: string;
   prioridade: number;
   status: string;
+  imagem?: string;
 }

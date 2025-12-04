@@ -22,3 +22,15 @@ class DepartamentoRepository:
                     COUNT(CD.Categoria) = (SELECT COUNT(*) FROM Categoria)
             """)
             return cursor.fetchall()
+
+    def find_categories_by_totem(self, numero_serie: str) -> List[Dict[Any, Any]]:
+        with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute("""
+                SELECT DISTINCT CD.Categoria AS nome
+                FROM Categoria_Departamento CD
+                INNER JOIN Departamento D ON CD.Sigla = D.Sigla
+                INNER JOIN Totem T ON D.NomeCidade = T.NomeCidade AND D.Estado = T.Estado
+                WHERE T.Numero_Serie = %s
+                ORDER BY CD.Categoria
+            """, (numero_serie,))
+            return cursor.fetchall()

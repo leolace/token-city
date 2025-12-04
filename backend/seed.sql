@@ -28,7 +28,8 @@ INSERT INTO Categoria (Nome) VALUES
 INSERT INTO Departamento (Sigla, Nome, NomeCidade, Estado, Coordenadas) VALUES
 ('DEPT01', 'Obras e Infraestrutura', 'São Paulo', 'SP', '-23.550520,-46.633309'),
 ('DEPT02', 'Limpeza Urbana', 'São Paulo', 'SP', '-23.550520,-46.633309'),
-('DEPT03', 'Iluminação Pública', 'Rio de Janeiro', 'RJ', '-22.906847,-43.172896');
+('DEPT03', 'Iluminação Pública', 'Rio de Janeiro', 'RJ', '-22.906847,-43.172896'),
+('DEPT04', 'Manutenção Urbana', 'São Carlos', 'SP', '-22.006775,-47.896859');
 
 -- Vinculação inicial entre problemas (Categorias) e solucionadores (Departamentos).
 -- Novos vínculos podem ser adicionados posteriormente, permitindo que a quantidade 
@@ -40,7 +41,10 @@ INSERT INTO Categoria_Departamento (Categoria, Sigla) VALUES
 ('Calçada', 'DEPT01'),
 ('Sinalização', 'DEPT01'),
 ('Lixo', 'DEPT02'),
-('Iluminação', 'DEPT03');
+('Iluminação', 'DEPT03'),
+('Buraco', 'DEPT04'),
+('Calçada', 'DEPT04'),
+('Lixo', 'DEPT04');
 
 -- Inserção dos terminais de atendimento (Totems) em diferentes localidades.
 -- A amostra inclui unidades em capitais (SP, RJ) e no interior (São Carlos)
@@ -59,7 +63,8 @@ INSERT INTO Usuario (CPF, Nome, Senha, Email) VALUES
 ('98765432100', 'Pedro Lima', 'senha123', 'pedro@email.com'),
 ('11122233344', 'Carla Souza', 'senha123', 'carla@email.com'),
 ('11111111111', 'João Silva', 'senha123', 'joao@dept01.com'),
-('22222222222', 'Maria Santos', 'senha123', 'maria@dept02.com');
+('22222222222', 'Maria Santos', 'senha123', 'maria@dept02.com'),
+('33333333333', 'Carlos Oliveira', 'senha123', 'carlos@dept04.com');
 
 -- Atribuição do papel de "Denunciante" aos usuários base previamente cadastrados.
 -- Define o status operacional e o saldo inicial, habilitando o usuário a interagir
@@ -71,21 +76,24 @@ INSERT INTO Denunciante (Usuario, Saldo_Tokens, Status) VALUES
 
 -- Cadastro de perfis funcionais com matrícula e data de admissão.
 -- Estabelece o vínculo empregatício e o nível de acesso ao sistema administrativo.
-INSERT INTO Funcionario (Usuario, Matricula, Data_admissao, Cargo, Nivel, Sigla) VALUES
-('11111111111', 'MAT0000001', '2023-01-10', 'Coordenador', 'ADMINISTRADOR', 'DEPT01'),
-('22222222222', 'MAT0000002', '2023-02-15', 'Analista', 'OPERADOR', 'DEPT02');
+INSERT INTO Funcionario (Usuario, Matricula, Data_admissao, Cargo, Nivel) VALUES
+('11111111111', 'MAT0000001', '2023-01-10', 'Coordenador', 'ADMINISTRADOR'),
+('22222222222', 'MAT0000002', '2023-02-15', 'Analista', 'OPERADOR'),
+('33333333333', 'MAT0000003', '2023-03-20', 'Técnico', 'OPERADOR');
 
 -- Atribui o perfil de Administrador a um usuário existente para permitir a gestão completa do sistema a ele.
 INSERT INTO Administrador (Usuario, Ultima_alteracao_sistema) VALUES
 ('11111111111', '2024-11-30');
 
--- Atribui o perfil de Operador a um usuário existente para habilitar a execução de tarefas técnicas e operacionais a ele.
+-- Atribui o perfil de Operador aos usuários operadores para habilitar a execução de tarefas técnicas e operacionais.
 INSERT INTO Operador (Usuario) VALUES
-('22222222222');
+('22222222222'),
+('33333333333');
 
--- Vincula um operador a um departamento específico
+-- Vincula operadores aos seus departamentos específicos
 INSERT INTO Operador_Departamento (Sigla, Operador) VALUES
-('DEPT02', '22222222222');
+('DEPT02', '22222222222'),
+('DEPT04', '33333333333');
 
 -- Definição inicial da "economia" do sistema, estabelecendo custos em tokens e limites de estoque.
 -- Novas recompensas podem ser inseridas futuramente para repor o inventário 
@@ -108,31 +116,31 @@ INSERT INTO Denuncia (Categoria, Usuario, Totem, Data, Coordenadas, Descricao, V
 -- evoluírem dentro do fluxo de atendimento (ex: análise, resolução).
 INSERT INTO Historico_Denuncia (Usuario, Data_Emissao_Denuncia, Coordenadas, Data_Historico, Status) VALUES
 -- Histórico da Denúncia 1 (Buraco - 2024-11-15 - Válida)
-('12345678901', '2024-11-15', '-23.550520,-46.633309', '2024-11-15', 'Registrada'),
-('12345678901', '2024-11-15', '-23.550520,-46.633309', '2024-11-16', 'Em Análise'),
-('12345678901', '2024-11-15', '-23.550520,-46.633309', '2024-11-18', 'Em Andamento'),
+('12345678901', '2024-11-15', '-23.550520,-46.633309', '2024-11-15 08:00:00', 'Registrada'),
+('12345678901', '2024-11-15', '-23.550520,-46.633309', '2024-11-16 10:30:00', 'Em Validação'),
+('12345678901', '2024-11-15', '-23.550520,-46.633309', '2024-11-18 14:45:00', 'Em Andamento'),
 
 -- Histórico da Denúncia 2 (Lixo - 2024-11-20 - Inválida)
-('98765432100', '2024-11-20', '-23.550520,-46.633309', '2024-11-20', 'Registrada'),
-('98765432100', '2024-11-20', '-23.550520,-46.633309', '2024-11-21', 'Em Validação'),
-('98765432100', '2024-11-20', '-23.550520,-46.633309', '2024-11-22', 'Recusada'),
+('98765432100', '2024-11-20', '-23.550520,-46.633309', '2024-11-20 09:15:00', 'Registrada'),
+('98765432100', '2024-11-20', '-23.550520,-46.633309', '2024-11-21 11:20:00', 'Em Validação'),
+('98765432100', '2024-11-20', '-23.550520,-46.633309', '2024-11-22 16:00:00', 'Rejeitada'),
 
 -- Histórico da Denúncia 3 (Iluminação - 2024-11-25 - Válida)
-('12345678901', '2024-11-25', '-22.906847,-43.172896', '2024-11-25', 'Registrada'),
-('12345678901', '2024-11-25', '-22.906847,-43.172896', '2024-11-26', 'Em Manutenção'),
-('12345678901', '2024-11-25', '-22.906847,-43.172896', '2024-11-27', 'Concluída'),
+('12345678901', '2024-11-25', '-22.906847,-43.172896', '2024-11-25 07:30:00', 'Registrada'),
+('12345678901', '2024-11-25', '-22.906847,-43.172896', '2024-11-26 13:00:00', 'Em Andamento'),
+('12345678901', '2024-11-25', '-22.906847,-43.172896', '2024-11-27 15:30:00', 'Resolvida'),
 
 -- Histórico da Denúncia 4 (Calçada - 2024-11-28 - Inválida)
-('11122233344', '2024-11-28', '-23.561684,-46.656139', '2024-11-28', 'Registrada'),
-('11122233344', '2024-11-28', '-23.561684,-46.656139', '2024-11-29', 'Em Validação'),
-('11122233344', '2024-11-28', '-23.561684,-46.656139', '2024-11-30', 'Arquivada');
+('11122233344', '2024-11-28', '-23.561684,-46.656139', '2024-11-28 10:00:00', 'Registrada'),
+('11122233344', '2024-11-28', '-23.561684,-46.656139', '2024-11-29 12:15:00', 'Em Validação'),
+('11122233344', '2024-11-28', '-23.561684,-46.656139', '2024-11-30 17:45:00', 'Rejeitada');
 
 -- Cria registros de atendimento para validar o relacionamento entre Funcionário e Denúncia,
--- simulando um cenário de teste onde a equipe técnica já está atuando (Análise/Validação)
+-- simulando um cenário de teste onde a equipe técnica já está atuando
 -- nas ocorrências recebidas.
 INSERT INTO FuncionarioDenuncia (Matricula, Usuario_Denunciante, Data_Denuncia, Coordenadas, Atuacao) VALUES
-('MAT0000001', '12345678901', '2024-11-15', '-23.550520,-46.633309', 'Análise'),
-('MAT0000002', '98765432100', '2024-11-20', '-23.550520,-46.633309', 'Validação');
+('MAT0000001', '12345678901', '2024-11-15', '-23.550520,-46.633309', 'Em Validação'),
+('MAT0000002', '98765432100', '2024-11-20', '-23.550520,-46.633309', 'Em Validação');
 
 -- Insere transações de troca de tokens com status variados ('Concluído' e 'Pendente')
 INSERT INTO Resgate (Data, Recompensa, Usuario, Status) VALUES
