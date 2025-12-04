@@ -96,3 +96,12 @@ def count_denuncias_pendentes(conn=Depends(get_db_connection)):
         + repository.count_by_status("Em Andamento")
     )
     return {"count": total}
+
+
+@router.get("/{usuario}/{data}/{coordenadas}")
+def get_denuncia_by_id(
+    usuario: str, data: str, coordenadas: str, conn=Depends(get_db_connection)
+):
+    repository = DenunciaRepository(conn)
+    controller = DenunciaController(repository)
+    return controller.get_denuncia_by_id(usuario, data, coordenadas)

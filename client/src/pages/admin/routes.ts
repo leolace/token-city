@@ -5,6 +5,8 @@ import { LoginPage } from "./pages/login";
 import { ReportsPage } from "./pages/reports";
 import { ReportersPage } from "./pages/reporters";
 import { DepartmentPage } from "./pages/department";
+import { TotemPage } from "./pages/totem";
+import { ReportPage } from "./pages/report";
 
 export const adminRoutes: RouteObject[] = [
   {
@@ -30,6 +32,14 @@ export const adminRoutes: RouteObject[] = [
       {
         path: "departamentos",
         Component: DepartmentPage,
+      },
+      {
+        path: "totem",
+        Component: TotemPage,
+      },
+      {
+        path: "denuncia/:userId/:date/:coordinates",
+        Component: ReportPage,
       },
     ],
   },

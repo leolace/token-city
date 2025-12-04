@@ -5,7 +5,7 @@ import { Link, NavLink } from "react-router";
 const navItems = [
   { label: "Denúncias", path: "/admin/denuncias" },
   { label: "Denunciantes", path: "/admin/denunciantes" },
-  { label: "Totems", path: "/admin/totems" },
+  { label: "Totems", path: "/admin/totem" },
   { label: "Recompensas", path: "/admin/recompensas" },
   { label: "Categorias", path: "/admin/categorias" },
   { label: "Departamentos", path: "/admin/departamentos" },

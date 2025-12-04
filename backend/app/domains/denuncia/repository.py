@@ -70,6 +70,7 @@ class DenunciaRepository:
             query = """
                 SELECT
                     D.*,
+                    U.CPF AS CPF_Usuario_Denunciante,
                     HD.Status,
                     D.Data AS Data_Registro,
                     U.Nome AS Nome_Usuario_Denunciante
@@ -221,3 +222,74 @@ class DenunciaRepository:
             )
             result = cursor.fetchone()
             return result[0] if result else 0
+
+    def find_by_id(
+        self, usuario: str, data: str, coordenadas: str
+    ) -> Dict[Any, Any] | None:
+        with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            # Primeiro, buscar os dados principais da denúncia
+            cursor.execute(
+                """
+                SELECT
+                    D.Categoria AS categoria,
+                    D.Usuario AS usuario,
+                    D.Totem AS totem,
+                    D.Data AS data,
+                    D.Coordenadas AS coordenadas,
+                    D.Descricao AS descricao,
+                    D.Valida AS valida,
+                    D.Prioridade AS prioridade,
+                    D.Sigla AS sigla,
+                    U.Nome AS nome_usuario,
+                    U.Email AS email_usuario,
+                    T.NomeCidade AS cidade_totem,
+                    T.Estado AS estado_totem,
+                    DEP.Nome AS nome_departamento
+                FROM
+                    Denuncia AS D
+                INNER JOIN
+                    Usuario AS U ON D.Usuario = U.CPF
+                INNER JOIN
+                    Totem AS T ON D.Totem = T.Numero_Serie
+                LEFT JOIN
+                    Departamento AS DEP ON D.Sigla = DEP.Sigla
+                WHERE
+                    D.Usuario = %s
+                    AND D.Data = %s
+                    AND D.Coordenadas = %s
+            """,
+                (usuario, data, coordenadas),
+            )
+            denuncia = cursor.fetchone()
+
+            if not denuncia:
+                return None
+
+            # Buscar todo o histórico de status
+            cursor.execute(
+                """
+                SELECT
+                    H.Status AS status,
+                    H.Data_Historico AS data_historico
+                FROM
+                    Historico_Denuncia AS H
+                WHERE
+                    H.Usuario = %s
+                    AND H.Data_Emissao_Denuncia = %s
+                    AND H.Coordenadas = %s
+                ORDER BY H.Data_Historico DESC
+            """,
+                (usuario, data, coordenadas),
+            )
+            historico = cursor.fetchall()
+
+            # Adicionar o histórico ao resultado
+            result = dict(denuncia)
+            result["historico"] = historico
+            # Adicionar o status mais recente para compatibilidade
+            result["status"] = historico[0]["status"] if historico else None
+            result["data_historico"] = (
+                historico[0]["data_historico"] if historico else None
+            )
+
+            return result

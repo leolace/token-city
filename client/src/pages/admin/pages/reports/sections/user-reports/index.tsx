@@ -2,17 +2,28 @@ import { useState } from "react";
 import { CitySelect } from "./components/city-select";
 import { Card, CardContent } from "@app/components/primitives/card";
 import { Badge } from "@app/components/primitives/badge";
+import { Button } from "@app/components/primitives/button";
 import { Item, ItemContent, ItemHeader } from "@app/components/primitives/item";
 import dayjs from "dayjs";
 import { useGetMostRecentsReportsByCity } from "./hooks";
+import { useNavigate } from "react-router";
+import { Eye } from "lucide-react";
+import type { Report } from "@app/types/report";
 
 export const UserReports = () => {
+  const navigate = useNavigate();
   const [city, setCity] = useState<string>("São Paulo-SP");
   const [cityName, cityState] = city.split("-");
   const { reports, isReportsLoading } = useGetMostRecentsReportsByCity({
     city: cityName,
     state: cityState,
   });
+
+  const handleViewDetails = (report: Report) => {
+    navigate(
+      `/admin/denuncia/${report.cpf}/${report.data}/${report.coordenadas}`,
+    );
+  };
 
   return (
     <div className="grid gap-6">
@@ -44,17 +55,30 @@ export const UserReports = () => {
                   {userReport.denuncias.map((report, idx) => (
                     <Item key={idx} variant="outline">
                       <ItemHeader>
-                        <div className="flex justify-between w-full">
-                          <p className="font-medium">{report.descricao}</p>
+                        <div className="flex justify-between w-full items-center gap-2">
+                          <p className="font-medium flex-1">
+                            {report.descricao}
+                          </p>
                           <p className="text-sm">
                             {dayjs(report.data).format("DD/MM/YYYY")}
                           </p>
                         </div>
                       </ItemHeader>
                       <ItemContent>
-                        <div className="flex gap-2 flex-wrap items-center">
-                          <Badge>{report.categoria}</Badge>
-                          <Badge variant="secondary">{report.status}</Badge>
+                        <div className="flex gap-2 items-center justify-between">
+                          <div className="flex gap-2 flex-wrap items-center">
+                            <Badge>{report.categoria}</Badge>
+                            <Badge variant="secondary">{report.status}</Badge>
+                          </div>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => handleViewDetails(report)}
+                            className="gap-2 shrink-0"
+                          >
+                            <Eye className="w-4 h-4" />
+                            Ver Detalhes
+                          </Button>
                         </div>
                       </ItemContent>
                     </Item>

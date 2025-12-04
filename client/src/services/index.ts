@@ -3,7 +3,10 @@ import { client } from "./client";
 import { endpoints } from "./endpoints";
 import type {
   CreateReportRequest,
+  CreateTotemRequest,
+  DeleteTotemRequest,
   GetPendingReportsRequest,
+  GetReportRequest,
   LoginRequest,
   ReporterProfileRequest,
 } from "./request";
@@ -12,6 +15,7 @@ import type {
   RepoerterProfileResponse,
   GetPendingReportsResponse,
   GetAllTotemsResponse,
+  GetReportResponse,
 } from "./response";
 import type { GetMostRecentsReportsRequest } from "./request/get-most-recents-reports";
 import type { GetTopReporterResponse } from "./response/get-top-reporter";
@@ -30,6 +34,12 @@ export const coreService = {
   },
 
   report: {
+    get: async ({ userId, date, coordenadas }: GetReportRequest) => {
+      const data = await client
+        .get(endpoints.report.get(userId, date, coordenadas))
+        .json<GetReportResponse>();
+      return data;
+    },
     create: async (json: CreateReportRequest) => {
       await client.post(endpoints.report.create, { json });
     },
@@ -97,6 +107,12 @@ export const coreService = {
         .get(endpoints.totem.all)
         .json<GetAllTotemsResponse>();
       return data;
+    },
+    create: async (req: CreateTotemRequest) => {
+      await client.post(endpoints.totem.endpoint, { json: req });
+    },
+    delete: async (req: DeleteTotemRequest) => {
+      await client.delete(endpoints.totem.delete(req.numero_serie));
     },
   },
 

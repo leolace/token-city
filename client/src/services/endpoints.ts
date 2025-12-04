@@ -5,6 +5,8 @@ export const endpoints = {
     login: `${BASE_URL}/user/login`,
   },
   report: {
+    get: (userId: string, data: string, coordenadas: string) =>
+      `${BASE_URL}/denuncia/${userId}/${data}/${coordenadas}`,
     create: `${BASE_URL}/denuncia`,
     all: `${BASE_URL}/denuncia/all`,
     countResolved: `${BASE_URL}/denuncia/count/resolvidas`,
@@ -21,7 +23,9 @@ export const endpoints = {
     countRedeemed: `${BASE_URL}/recompensa/count/resgates`,
   },
   totem: {
+    endpoint: `${BASE_URL}/totem`,
     all: `${BASE_URL}/totem`,
+    delete: (numero_serie: string) => `${BASE_URL}/totem/${numero_serie}`,
   },
   department: {
     byStatus: `${BASE_URL}/denuncia/metricas/por-departamento-status`,

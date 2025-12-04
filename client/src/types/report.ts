@@ -17,4 +17,5 @@ export interface Report {
   descricao: string;
   prioridade: number;
   status: string;
+  cpf: string;
 }
