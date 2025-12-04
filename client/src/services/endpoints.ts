@@ -5,6 +5,7 @@ export const endpoints = {
     login: `${BASE_URL}/user/login`,
   },
   operatorLogin: `${BASE_URL}/user/login/operador`,
+  adminLogin: `${BASE_URL}/user/login/admin`,
   report: {
     get: (userId: string, data: string, coordenadas: string) =>
       `${BASE_URL}/denuncia/${userId}/${data}/${coordenadas}`,

@@ -48,3 +48,11 @@ def login_operador(request: LoginOperadorRequest, conn=Depends(get_db_connection
     denunciante_repository = DenuncianteRepository(conn)
     controller = UsuarioController(usuario_repository, denunciante_repository)
     return controller.login_operador(request.matricula, request.password)
+
+
+@router.post("/login/admin")
+def login_admin(request: LoginOperadorRequest, conn=Depends(get_db_connection)):
+    usuario_repository = UsuarioRepository(conn)
+    denunciante_repository = DenuncianteRepository(conn)
+    controller = UsuarioController(usuario_repository, denunciante_repository)
+    return controller.login_admin(request.matricula, request.password)
