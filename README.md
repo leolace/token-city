@@ -47,3 +47,11 @@ pnpm preview
    - Frontend: http://localhost:4173
 
 OBS.: O frontend e o backend precisam estar rodando ao mesmo tempo (em terminais separados)
+
+## Rotas
+
+- http://localhost:4173 = Totem de São Carlos;
+
+- http://localhost:4173/operador = Página do Operador (Matrícula MAT0000003, Senha senha123 para um operador de São Carlos);
+
+- http://localhost:4173/admin = Página do Admin (Matrícula MAT0000001, Senha senha123).
