@@ -21,6 +21,11 @@ class SignupRequest(BaseModel):
     email: str
 
 
+class LoginOperadorRequest(BaseModel):
+    matricula: str
+    password: str
+
+
 @router.post("/login")
 def login(request: LoginRequest, conn=Depends(get_db_connection)):
     usuario_repository = UsuarioRepository(conn)
@@ -35,3 +40,11 @@ def signup(request: SignupRequest, conn=Depends(get_db_connection)):
     denunciante_repository = DenuncianteRepository(conn)
     controller = UsuarioController(usuario_repository, denunciante_repository)
     return controller.signup(request.cpf, request.name, request.password, request.email)
+
+
+@router.post("/login/operador")
+def login_operador(request: LoginOperadorRequest, conn=Depends(get_db_connection)):
+    usuario_repository = UsuarioRepository(conn)
+    denunciante_repository = DenuncianteRepository(conn)
+    controller = UsuarioController(usuario_repository, denunciante_repository)
+    return controller.login_operador(request.matricula, request.password)

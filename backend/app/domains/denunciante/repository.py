@@ -49,6 +49,14 @@ class DenuncianteRepository:
             )
             self.connection.commit()
 
+    def add_tokens(self, usuario_cpf: str, valor: int) -> None:
+        with self.connection.cursor() as cursor:
+            cursor.execute(
+                "UPDATE Denunciante SET Saldo_Tokens = Saldo_Tokens + %s WHERE Usuario = %s",
+                (valor, usuario_cpf),
+            )
+            self.connection.commit()
+
     def find_top_denunciante(self) -> Dict[Any, Any]:
         with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute("""

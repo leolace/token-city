@@ -1,4 +1,6 @@
 from typing import Dict, Any
+from fastapi import HTTPException
+
 
 class SignupUseCase:
     def __init__(self, usuario_repository, denunciante_repository):
@@ -9,7 +11,7 @@ class SignupUseCase:
         existing_user = self.usuario_repository.find_by_email(email)
         
         if existing_user:
-            raise ValueError("Email já cadastrado")
+            raise HTTPException(status_code=409, detail="Email já cadastrado")
         
         usuario = self.usuario_repository.create(cpf, nome, senha, email)
         self.denunciante_repository.create(cpf)

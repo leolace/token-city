@@ -5,3 +5,4 @@ export * from "./get-pending-reports";
 export * from "./create-totem";
 export * from "./delete-totem";
 export * from "./get-report";
+export * from "./update-report-status";

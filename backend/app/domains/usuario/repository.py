@@ -8,7 +8,7 @@ class UsuarioRepository:
     def find_by_email_and_password(self, email: str, senha: str) -> Optional[Dict[Any, Any]]:
         with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(
-                "SELECT * FROM Usuario WHERE Email = %s AND Senha = %s",
+                "SELECT CPF, Nome, Email FROM Usuario WHERE Email = %s AND Senha = %s",
                 (email, senha)
             )
             return cursor.fetchone()
@@ -16,9 +16,31 @@ class UsuarioRepository:
     def find_by_email(self, email: str) -> Optional[Dict[Any, Any]]:
         with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
             cursor.execute(
-                "SELECT * FROM Usuario WHERE Email = %s",
+                "SELECT CPF, Nome, Email FROM Usuario WHERE Email = %s",
                 (email,)
             )
+            return cursor.fetchone()
+
+    def find_by_matricula_and_password(self, matricula: str, senha: str) -> Optional[Dict[Any, Any]]:
+        with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute("""
+                SELECT 
+                    u.CPF, 
+                    u.Nome, 
+                    u.Email, 
+                    f.Matricula, 
+                    f.Cargo, 
+                    f.Nivel,
+                    COALESCE(
+                        (SELECT json_agg(od.Sigla) 
+                         FROM Operador_Departamento od 
+                         WHERE od.Operador = f.Usuario),
+                        '[]'::json
+                    ) as Departamentos
+                FROM Usuario u
+                INNER JOIN Funcionario f ON u.CPF = f.Usuario
+                WHERE f.Matricula = %s AND u.Senha = %s
+            """, (matricula, senha))
             return cursor.fetchone()
 
     def create(self, cpf: str, nome: str, senha: str, email: str) -> Dict[Any, Any]:

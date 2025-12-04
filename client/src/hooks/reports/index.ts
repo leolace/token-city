@@ -9,6 +9,17 @@ export const useAllDenuncias = () => {
   });
 };
 
+export const useDenunciasByDepartment = (sigla: string | null) => {
+  return useQuery({
+    queryKey: ["denuncias", "department", sigla],
+    queryFn: () => {
+      if (!sigla) throw new Error("Sigla do departamento é necessária");
+      return coreService.report.byDepartment(sigla);
+    },
+    enabled: !!sigla,
+  });
+};
+
 export const usePendingReports = ({
   category,
   coordinates,

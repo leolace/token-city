@@ -11,10 +11,11 @@ from app.domains.denuncia.use_cases.get_metrics_by_department import (
 from app.domains.denuncia.use_cases.get_most_recent_by_city import (
     GetMostRecentByCityUseCase,
 )
+from app.domains.denuncia.use_cases.update_status import UpdateStatusUseCase
 
 
 class DenunciaController:
-    def __init__(self, denuncia_repository):
+    def __init__(self, denuncia_repository, denunciante_repository=None):
         self.create_denuncia_use_case = CreateDenunciaUseCase(denuncia_repository)
         self.get_denuncias_by_area_use_case = GetDenunciasByAreaUseCase(
             denuncia_repository
@@ -26,6 +27,9 @@ class DenunciaController:
             denuncia_repository
         )
         self.get_denuncia_by_id_use_case = GetDenunciaByIdUseCase(denuncia_repository)
+        self.update_status_use_case = UpdateStatusUseCase(
+            denuncia_repository, denunciante_repository
+        )
 
     def create_denuncia(
         self,
@@ -58,3 +62,15 @@ class DenunciaController:
         if not denuncia:
             raise HTTPException(status_code=404, detail="Denúncia não encontrada")
         return denuncia
+
+    def update_status(
+        self,
+        usuario: str,
+        data: str,
+        coordenadas: str,
+        novo_status: str,
+        matricula_funcionario: str,
+    ):
+        return self.update_status_use_case.execute(
+            usuario, data, coordenadas, novo_status, matricula_funcionario
+        )

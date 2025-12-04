@@ -10,3 +10,9 @@ def get_all_category_handlers(conn=Depends(get_db_connection)):
     repository = DepartamentoRepository(conn)
     controller = DepartamentoController(repository)
     return controller.get_all_category_handlers()
+
+
+@router.get("/categorias/totem/{numero_serie}")
+def get_categories_by_totem(numero_serie: str, conn=Depends(get_db_connection)):
+    repository = DepartamentoRepository(conn)
+    return repository.find_categories_by_totem(numero_serie)
