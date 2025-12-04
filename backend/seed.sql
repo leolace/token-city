@@ -64,7 +64,8 @@ INSERT INTO Usuario (CPF, Nome, Senha, Email) VALUES
 ('11122233344', 'Carla Souza', 'senha123', 'carla@email.com'),
 ('11111111111', 'João Silva', 'senha123', 'joao@dept01.com'),
 ('22222222222', 'Maria Santos', 'senha123', 'maria@dept02.com'),
-('33333333333', 'Carlos Oliveira', 'senha123', 'carlos@dept04.com');
+('33333333333', 'Carlos Oliveira', 'senha123', 'carlos@dept04.com'),
+('44444444444', 'Paula Ferreira', 'senha123', 'paula@admin.com');
 
 -- Atribuição do papel de "Denunciante" aos usuários base previamente cadastrados.
 -- Define o status operacional e o saldo inicial, habilitando o usuário a interagir
@@ -79,11 +80,13 @@ INSERT INTO Denunciante (Usuario, Saldo_Tokens, Status) VALUES
 INSERT INTO Funcionario (Usuario, Matricula, Data_admissao, Cargo, Nivel) VALUES
 ('11111111111', 'MAT0000001', '2023-01-10', 'Coordenador', 'ADMINISTRADOR'),
 ('22222222222', 'MAT0000002', '2023-02-15', 'Analista', 'OPERADOR'),
-('33333333333', 'MAT0000003', '2023-03-20', 'Técnico', 'OPERADOR');
+('33333333333', 'MAT0000003', '2023-03-20', 'Técnico', 'OPERADOR'),
+('44444444444', 'MAT0000004', '2023-04-05', 'Gerente', 'ADMINISTRADOR');
 
 -- Atribui o perfil de Administrador a um usuário existente para permitir a gestão completa do sistema a ele.
 INSERT INTO Administrador (Usuario, Ultima_alteracao_sistema) VALUES
-('11111111111', '2024-11-30');
+('11111111111', '2024-11-30'),
+('44444444444', '2024-12-01');
 
 -- Atribui o perfil de Operador aos usuários operadores para habilitar a execução de tarefas técnicas e operacionais.
 INSERT INTO Operador (Usuario) VALUES
