@@ -23,7 +23,7 @@ const defaultValues = {
 };
 
 export const AuthDialog = ({ children }: Props) => {
-  const { loginReporter, isReporterLoginLoading } = useReporterLoginMutation();
+  const { loginReporter, isReporterLoginLoading, loginError, isLoginError, resetError } = useReporterLoginMutation();
 
   const form = useForm({
     defaultValues,
@@ -35,6 +35,7 @@ export const AuthDialog = ({ children }: Props) => {
     },
     validators: {
       onChange: ({ value }) => {
+        if (isLoginError) resetError();
         if (value.email.length === 0 || value.password.length === 0)
           return "Preencha todos os campos";
         return undefined;
@@ -87,6 +88,12 @@ export const AuthDialog = ({ children }: Props) => {
               />
             )}
           />
+
+          {isLoginError && (
+            <div className="bg-red-500/10 border border-red-500 text-red-500 p-3 rounded-md text-sm">
+              {loginError?.message || "Credenciais inv\u00e1lidas"}
+            </div>
+          )}
 
           <div className="flex gap-3 justify-between">
             <DialogClose>

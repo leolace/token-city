@@ -10,12 +10,15 @@ export const useReporterLoginMutation = () => {
   const { login, isLoginLoading } = useLoginMutation();
   const setReporter = useUserStore((state) => state.setReporter);
 
-  const { data, mutate, isPending } = useMutation({
+  const { data, mutate, isPending, error, isError, reset } = useMutation({
     mutationFn: async (req: LoginRequest) => {
-      const { cpf } = await login(req);
-      const data = await coreService.reporter.profile({ cpf });
-
-      return data;
+      try {
+        const { cpf } = await login(req);
+        const data = await coreService.reporter.profile({ cpf });
+        return data;
+      } catch (err: any) {
+        throw new Error("Email ou senha inválidos");
+      }
     },
     onSuccess: (data) => {
       setReporter(data);
@@ -27,5 +30,8 @@ export const useReporterLoginMutation = () => {
     loginReporter: mutate,
     reporterProfile: data,
     isReporterLoginLoading: isPending || isLoginLoading,
+    loginError: error,
+    isLoginError: isError,
+    resetError: reset,
   };
 };

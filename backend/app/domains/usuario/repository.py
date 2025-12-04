@@ -39,7 +39,25 @@ class UsuarioRepository:
                     ) as Departamentos
                 FROM Usuario u
                 INNER JOIN Funcionario f ON u.CPF = f.Usuario
-                WHERE f.Matricula = %s AND u.Senha = %s
+                INNER JOIN Operador o ON o.Usuario = f.Usuario
+                WHERE f.Matricula = %s AND u.Senha = %s AND f.Nivel = 'OPERADOR'
+            """, (matricula, senha))
+            return cursor.fetchone()
+
+    def find_admin_by_matricula_and_password(self, matricula: str, senha: str) -> Optional[Dict[Any, Any]]:
+        with self.connection.cursor(cursor_factory=RealDictCursor) as cursor:
+            cursor.execute("""
+                SELECT 
+                    u.CPF, 
+                    u.Nome, 
+                    u.Email, 
+                    f.Matricula, 
+                    f.Cargo, 
+                    f.Nivel
+                FROM Usuario u
+                INNER JOIN Funcionario f ON u.CPF = f.Usuario
+                INNER JOIN Administrador a ON a.Usuario = f.Usuario
+                WHERE f.Matricula = %s AND u.Senha = %s AND f.Nivel = 'ADMINISTRADOR'
             """, (matricula, senha))
             return cursor.fetchone()
 

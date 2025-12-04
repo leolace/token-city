@@ -7,7 +7,10 @@ import {
 } from "@app/components/primitives/card";
 import { Input } from "@app/components/primitives/input";
 import { Label } from "@app/components/primitives/label";
+import { adminLogin } from "@app/services/request/admin-login";
+import { useAdminStore } from "@app/stores/admin";
 import { useForm } from "@tanstack/react-form";
+import { useState } from "react";
 import { useNavigate } from "react-router";
 
 interface LoginForm {
@@ -22,13 +25,37 @@ const defaultValues: LoginForm = {
 
 export const LoginPage = () => {
   const navigate = useNavigate();
+  const [error, setError] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { setAdmin } = useAdminStore();
 
   const form = useForm({
     defaultValues,
     onSubmit: async ({ value }) => {
-      console.log(value);
-      // TODO: Implementar autenticação
-      navigate("/admin/dashboard");
+      setError("");
+      setIsLoading(true);
+      
+      try {
+        const response = await adminLogin({
+          matricula: value.matricula,
+          password: value.senha,
+        }) as any;
+        
+        setAdmin({
+          cpf: response.cpf,
+          nome: response.nome,
+          email: response.email,
+          matricula: response.matricula.trim(),
+          cargo: response.cargo,
+          nivel: response.nivel,
+        });
+        navigate("/admin/dashboard");
+      } catch (err) {
+        console.error("Erro no login:", err);
+        setError((err as any)?.response?.data?.detail || "Matrícula ou senha inválida ou usuário não é administrador");
+      } finally {
+        setIsLoading(false);
+      }
     },
   });
 
@@ -80,8 +107,14 @@ export const LoginPage = () => {
               )}
             />
 
-            <Button type="submit" className="w-full" size="lg">
-              Entrar
+            {error && (
+              <div className="bg-red-500/10 border border-red-500 text-red-500 p-3 rounded-md text-sm">
+                {error}
+              </div>
+            )}
+
+            <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
+              {isLoading ? "Entrando..." : "Entrar"}
             </Button>
           </form>
         </CardContent>
