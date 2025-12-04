@@ -153,9 +153,16 @@ class DenunciaRepository:
                 )
                 SELECT
                     U.Nome AS nome_Usuario,
-                    D_RE.*,
+                    D_RE.Categoria,
+                    D_RE.Usuario,
+                    D_RE.Totem,
+                    D_RE.Data,
+                    D_RE.Coordenadas,
                     D_RE.Descricao AS descricao,
-                    US.Status AS statusAtual,
+                    D_RE.Valida,
+                    D_RE.Prioridade,
+                    D_RE.Sigla,
+                    US.Status,
                     D_RE.Data AS dataRegistro
                 FROM Denuncia AS D_RE
                 INNER JOIN Usuario AS U ON D_RE.Usuario = U.CPF
