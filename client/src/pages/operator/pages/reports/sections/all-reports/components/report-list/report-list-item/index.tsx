@@ -21,7 +21,8 @@ export const ReportListItemWithStatus = ({ report }: Props) => {
             <div className="flex flex-col gap-1">
               <p className="font-medium">{report.descricao}</p>
               <p className="text-sm text-muted-foreground">
-                {report.nomeusuario} - {dayjs(report.data).format("DD/MM/YYYY")}
+                {report.nome_usuario} -{" "}
+                {dayjs(report.data).format("DD/MM/YYYY")}
               </p>
             </div>
             <Button size="sm" onClick={() => setIsDialogOpen(true)}>
@@ -37,9 +38,9 @@ export const ReportListItemWithStatus = ({ report }: Props) => {
               <Badge variant="outline">Prioridade: {report.prioridade}</Badge>
             </div>
             {report.imagem && (
-              <img 
-                src={report.imagem} 
-                alt="Imagem da denúncia" 
+              <img
+                src={report.imagem}
+                alt="Imagem da denúncia"
                 className="w-full max-w-md rounded-md object-cover"
               />
             )}

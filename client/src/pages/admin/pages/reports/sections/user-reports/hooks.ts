@@ -16,10 +16,10 @@ export const useGetMostRecentsReportsByCity = ({ state, city }: Props) => {
   const reportsByUser =
     data?.denuncias.reduce(
       (acc, report) => {
-        if (!acc[report.nomeUsuario]) {
-          acc[report.nomeUsuario] = [];
+        if (!acc[report.nome_usuario]) {
+          acc[report.nome_usuario] = [];
         }
-        acc[report.nomeUsuario].push(report);
+        acc[report.nome_usuario].push(report);
         return acc;
       },
       {} as Record<string, typeof data.denuncias>,

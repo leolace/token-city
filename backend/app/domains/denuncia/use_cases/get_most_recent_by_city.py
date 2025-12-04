@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Dict, List
 
 
 class GetMostRecentByCityUseCase:
@@ -11,15 +11,4 @@ class GetMostRecentByCityUseCase:
         denuncias = self.denuncia_repository.find_most_recent_by_city(
             nome_cidade, sigla_estado
         )
-        return {
-            "denuncias": [
-                {
-                    "nomeUsuario": d["nomedenunciante"],
-                    "descricao": d["descricao"],
-                    "status": d["statusatual"],
-                    "dataRegistro": str(d["dataregistro"]),
-                    "categoria": d["categoria"],
-                }
-                for d in denuncias
-            ]
-        }
+        return {"denuncias": denuncias}

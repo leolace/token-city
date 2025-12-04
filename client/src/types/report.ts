@@ -11,7 +11,7 @@ export type ReportCategory =
 
 export interface Report {
   categoria: ReportCategory;
-  nomeusuario: string;
+  nome_usuario: string;
   usuario: string;
   data: string;
   coordenadas: string;

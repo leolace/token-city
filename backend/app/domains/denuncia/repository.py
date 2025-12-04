@@ -152,7 +152,7 @@ class DenunciaRepository:
                     ORDER BY Usuario, Data_Emissao_Denuncia, Coordenadas, Data_Historico DESC
                 )
                 SELECT
-                    U.Nome AS nomeDenunciante,
+                    U.Nome AS nome_Usuario,
                     D_RE.*,
                     D_RE.Descricao AS descricao,
                     US.Status AS statusAtual,
@@ -205,7 +205,7 @@ class DenunciaRepository:
                     D.Valida,
                     D.Prioridade,
                     US.Status,
-                    U.Nome AS NomeUsuario
+                    U.Nome AS Nome_Usuario
                 FROM Denuncia AS D
                 INNER JOIN UltimoStatus US ON
                     D.Usuario = US.Usuario AND
@@ -236,7 +236,7 @@ class DenunciaRepository:
                     D.Prioridade,
                     D.Sigla,
                     US.Status,
-                    U.Nome AS NomeUsuario
+                    U.Nome AS Nome_Usuario
                 FROM Denuncia AS D
                 INNER JOIN UltimoStatus US ON
                     D.Usuario = US.Usuario AND
@@ -273,7 +273,7 @@ class DenunciaRepository:
                     D.Prioridade,
                     D.Sigla,
                     US.Status,
-                    U.Nome AS NomeUsuario,
+                    U.Nome AS Nome_Usuario,
                     (SELECT M.URL
                      FROM Midia M
                      WHERE M.Usuario = D.Usuario
