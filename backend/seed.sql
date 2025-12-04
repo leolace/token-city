@@ -145,7 +145,7 @@ INSERT INTO FuncionarioDenuncia (Matricula, Usuario_Denunciante, Data_Denuncia, 
 ('MAT0000001', '12345678901', '2024-11-15', '-23.550520,-46.633309', 'Em Validação'),
 ('MAT0000002', '98765432100', '2024-11-20', '-23.550520,-46.633309', 'Em Validação');
 
--- Insere transações de troca de tokens com status variados ('Concluído' e 'Pendente')
+-- Insere transações de troca de tokens com status variados
 INSERT INTO Resgate (Data, Recompensa, Usuario, Status) VALUES
-('2024-11-10', 'Cupom10Reais', '12345678901', 'Concluído'),
-('2024-11-22', 'Cupom25Reais', '11122233344', 'Pendente');
+('2024-11-10', 'Cupom10Reais', '12345678901', 'Entregue'),
+('2024-11-22', 'Cupom25Reais', '11122233344', 'Em processamento');
