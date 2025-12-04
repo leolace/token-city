@@ -10,7 +10,8 @@ export const endpoints = {
       `${BASE_URL}/denuncia/${userId}/${data}/${coordenadas}`,
     create: `${BASE_URL}/denuncia`,
     all: `${BASE_URL}/denuncia/all`,
-    byDepartment: (sigla: string) => `${BASE_URL}/denuncia/departamento/${sigla}`,
+    byDepartment: (sigla: string) =>
+      `${BASE_URL}/denuncia/departamento/${sigla}`,
     byDepartments: `${BASE_URL}/denuncia/departamentos`,
     countResolved: `${BASE_URL}/denuncia/count/resolvidas`,
     countPending: `${BASE_URL}/denuncia/count/pendentes`,
@@ -24,7 +25,9 @@ export const endpoints = {
     top: `${BASE_URL}/denunciante/top`,
   },
   reward: {
+    endpoint: `${BASE_URL}/recompensa`,
     countRedeemed: `${BASE_URL}/recompensa/count/resgates`,
+    byUser: (cpf: string) => `${BASE_URL}/recompensa/usuario/${cpf}`,
   },
   totem: {
     endpoint: `${BASE_URL}/totem`,
@@ -34,6 +37,7 @@ export const endpoints = {
   department: {
     byStatus: `${BASE_URL}/denuncia/metricas/por-departamento-status`,
     acceptAllCategories: `${BASE_URL}/departamentos/atende-todas-denuncias`,
-    categoriesByTotem: (totemId: string) => `${BASE_URL}/departamentos/categorias/totem/${totemId}`,
+    categoriesByTotem: (totemId: string) =>
+      `${BASE_URL}/departamentos/categorias/totem/${totemId}`,
   },
 };

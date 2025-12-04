@@ -6,13 +6,20 @@ import {
   SelectValue,
 } from "@app/components/primitives/select";
 import { useTotems } from "@app/hooks/totems";
+import type { SelectProps } from "@radix-ui/react-select";
 
-interface Props {
+interface Props extends SelectProps {
   selected: string;
   onChange: (value: string) => void;
+  placeholder?: string;
 }
 
-export const CitySelect = ({ selected, onChange }: Props) => {
+export const CitySelect = ({
+  selected,
+  onChange,
+  placeholder,
+  ...props
+}: Props) => {
   const { totems } = useTotems();
 
   const cities = Array.from(
@@ -25,9 +32,9 @@ export const CitySelect = ({ selected, onChange }: Props) => {
   );
 
   return (
-    <Select value={selected} onValueChange={onChange}>
-      <SelectTrigger className="w-[200px]">
-        <SelectValue placeholder="Cidade" />
+    <Select value={selected} onValueChange={onChange} {...props}>
+      <SelectTrigger className="w-full min-h-12">
+        <SelectValue placeholder={placeholder || "Cidade"} />
       </SelectTrigger>
       <SelectContent>
         {cities.map(({ city, state }) => (

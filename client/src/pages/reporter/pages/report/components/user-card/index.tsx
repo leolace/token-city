@@ -4,9 +4,12 @@ import { Card, CardAction, CardContent } from "@app/components/primitives/card";
 import { formatCPF } from "@app/lib/utils";
 import { useUserStore } from "@app/stores/user";
 import { SquareArrowOutUpRight, Wallet } from "lucide-react";
+import { useNavigate } from "react-router";
 
 export const UserCard = () => {
   const reporter = useUserStore((state) => state.reporter);
+  const navigate = useNavigate();
+
   return (
     <Card className="self-start w-full">
       <CardContent className="flex items-center">
@@ -20,7 +23,11 @@ export const UserCard = () => {
         </div>
 
         <CardAction>
-          <Button variant="ghost" size="xl">
+          <Button
+            variant="ghost"
+            size="xl"
+            onClick={() => navigate("/reporter/rewards")}
+          >
             <SquareArrowOutUpRight />
             Ver recompensas
           </Button>

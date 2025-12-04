@@ -19,6 +19,7 @@ import type { DeleteTotemRequest } from "@app/services/request/delete-totem";
 import { TotemMap } from "@app/components/totem-map";
 import { TotemMark } from "@app/components/totem-mark";
 import { getCords } from "@app/utils/get-cords";
+import { CitySelect } from "@app/components/city-select";
 
 const defaultForm = {
   numero_serie: "",
@@ -128,27 +129,17 @@ export const TotemPage = () => {
                   />
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="nome_cidade">Cidade</Label>
-                  <Input
-                    id="nome_cidade"
-                    value={formData.nome_cidade}
-                    onChange={(e) =>
-                      handleChange("nome_cidade", e.target.value)
-                    }
-                    placeholder="São Paulo"
-                    required
-                  />
-                </div>
+                <div className="space-y-2 w-full">
+                  <Label htmlFor="cidade">Cidade</Label>
+                  <CitySelect
+                    selected={`${formData.nome_cidade}-${formData.estado}`}
+                    onChange={(value) => {
+                      const [city, state] = value.split("-");
 
-                <div className="space-y-2">
-                  <Label htmlFor="estado">Estado</Label>
-                  <Input
-                    id="estado"
-                    value={formData.estado}
-                    onChange={(e) => handleChange("estado", e.target.value)}
-                    placeholder="SP"
-                    maxLength={2}
+                      handleChange("nome_cidade", city);
+                      handleChange("estado", state);
+                    }}
+                    placeholder="Selecione uma cidade"
                     required
                   />
                 </div>

@@ -1,6 +1,6 @@
 import { Button } from "@app/components/primitives/button";
 import { Card, CardContent } from "@app/components/primitives/card";
-import { CircleCheck } from "lucide-react";
+import { CircleCheck, Gift } from "lucide-react";
 import { useNavigate } from "react-router";
 
 export const SuccessPage = () => {
@@ -18,8 +18,21 @@ export const SuccessPage = () => {
           Agradecemos por contribuir para a melhoria da sua comunidade.
         </p>
 
-        <div className="mt-6 w-full">
-          <Button size="xl" onClick={() => navigate("/")} className="w-full">
+        <div className="mt-6 w-full space-y-3">
+          <Button
+            size="xl"
+            onClick={() => navigate("/reporter/rewards")}
+            className="w-full"
+          >
+            <Gift className="w-5 h-5" />
+            Ver Minhas Recompensas
+          </Button>
+          <Button
+            size="xl"
+            variant="outline"
+            onClick={() => navigate("/")}
+            className="w-full"
+          >
             Voltar para a página inicial
           </Button>
         </div>

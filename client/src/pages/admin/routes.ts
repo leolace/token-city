@@ -7,6 +7,7 @@ import { ReportersPage } from "./pages/reporters";
 import { DepartmentPage } from "./pages/department";
 import { TotemPage } from "./pages/totem";
 import { ReportPage } from "./pages/report";
+import { RewardPage } from "./pages/reward";
 
 export const adminRoutes: RouteObject[] = [
   {
@@ -40,6 +41,10 @@ export const adminRoutes: RouteObject[] = [
       {
         path: "denuncia/:userId/:date/:coordinates",
         Component: ReportPage,
+      },
+      {
+        path: "recompensas",
+        Component: RewardPage,
       },
     ],
   },

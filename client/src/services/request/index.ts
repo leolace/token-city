@@ -6,3 +6,4 @@ export * from "./create-totem";
 export * from "./delete-totem";
 export * from "./get-report";
 export * from "./update-report-status";
+export * from "./create-reward";

@@ -13,7 +13,7 @@ interface SetReporterAction {
 
 export const useUserStore = create<UserState & SetReporterAction>((set) => ({
   reporter: null,
-  setReporter: (reporter: Reporter) => set({ reporter }),
+  setReporter: (reporter) => set({ reporter }),
   user: null,
   setUser: (user: User) => set({ user }),
 }));

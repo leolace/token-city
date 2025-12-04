@@ -3,6 +3,7 @@ import { client } from "./client";
 import { endpoints } from "./endpoints";
 import type {
   CreateReportRequest,
+  CreateRewardRequest,
   CreateTotemRequest,
   DeleteTotemRequest,
   GetPendingReportsRequest,
@@ -16,6 +17,9 @@ import type {
   GetPendingReportsResponse,
   GetAllTotemsResponse,
   GetReportResponse,
+  GetAllRewardsResponse,
+  GetUserRewardsResponse,
+  RedeemRewardResponse,
 } from "./response";
 import type { GetMostRecentsReportsRequest } from "./request/get-most-recents-reports";
 import type { GetTopReporterResponse } from "./response/get-top-reporter";
@@ -48,7 +52,9 @@ export const coreService = {
       return data;
     },
     byDepartment: async (sigla: string) => {
-      const data = await client.get(endpoints.report.byDepartment(sigla)).json<Report[]>();
+      const data = await client
+        .get(endpoints.report.byDepartment(sigla))
+        .json<Report[]>();
       return data;
     },
     countResolved: async () => {
@@ -101,6 +107,29 @@ export const coreService = {
       const data = await client
         .get(endpoints.reward.countRedeemed)
         .json<CountResponse>();
+      return data;
+    },
+    listAll: async () => {
+      const data = await client
+        .get(endpoints.reward.endpoint)
+        .json<GetAllRewardsResponse>();
+      return data;
+    },
+    create: async (req: CreateRewardRequest) => {
+      await client.post(endpoints.reward.endpoint, { json: req });
+    },
+    getByUser: async (cpf: string) => {
+      const data = await client
+        .get(endpoints.reward.byUser(cpf))
+        .json<GetUserRewardsResponse>();
+      return data;
+    },
+    redeem: async (req: { userId: string; rewardId: string }) => {
+      const data = await client
+        .post(`${endpoints.reward.endpoint}/${req.rewardId}`, {
+          json: { userId: req.userId },
+        })
+        .json<RedeemRewardResponse>();
       return data;
     },
   },

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { CitySelect } from "./components/city-select";
 import { Card, CardContent } from "@app/components/primitives/card";
 import { Badge } from "@app/components/primitives/badge";
 import { Button } from "@app/components/primitives/button";
@@ -9,6 +8,7 @@ import { useGetMostRecentsReportsByCity } from "./hooks";
 import { useNavigate } from "react-router";
 import { Eye } from "lucide-react";
 import type { Report } from "@app/types/report";
+import { CitySelect } from "@app/components/city-select";
 
 export const UserReports = () => {
   const navigate = useNavigate();
