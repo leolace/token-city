@@ -107,7 +107,7 @@ CREATE TABLE Totem (
     NomeCidade VARCHAR(120) NOT NULL,
     Estado CHAR(2) NOT NULL,
     Coordenadas TipoCoordenadas NOT NULL,
-    Status VARCHAR(50) NOT NULL,
+    Status VARCHAR(50) NOT NULL CHECK (Status IN ('Ativo', 'Inativo', 'Em manutenção')),
     Data_instalacao DATE NOT NULL,
 
     FOREIGN KEY (NomeCidade, Estado) REFERENCES Cidade(Nome, Estado) ON DELETE CASCADE
@@ -125,7 +125,7 @@ CREATE TABLE Resgate (
     Data DATE NOT NULL,
     Recompensa VARCHAR(100) NOT NULL,
     Usuario CHAR(11) NOT NULL,
-    Status VARCHAR(50) NOT NULL,
+    Status VARCHAR(50) NOT NULL CHECK (Status IN ('Pendente', 'Em processamento', 'Entregue')),
 
     PRIMARY KEY (Usuario, Recompensa),
 
